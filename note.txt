@@ -1,0 +1,129 @@
+1. 代码块:<特定构件, 不单独使用>
+    {语句}
+    ----
+    lbrace()-statement()...-rbrace()
+    ----
+    compound:
+        left: statement
+        right: nullptr | compound
+
+2. if (表达式) 代码块 [else 代码块]<可用: 函数内部>
+    ----
+    if()-lparen()-expression()-rparen()-code_block()-[else()-code_block()]
+    ----
+    if:
+        left: expression
+        right: compound
+    if-else:
+        left: expression
+        right: else:
+            left: compound-if
+            right: compound-else
+
+3. while (表达式) 代码块<可用: 函数内部>
+    ----
+    while()-lparen()-expression()-rparen()-code_block()
+    ----
+    while:
+        left: expression
+        right: compound
+
+4. for (表达式; 表达式; 表达式) 代码块<可用: 函数内部>
+    ----
+    for()-lparen()-expression()-semicolon()-expression()-semicolon()-expression()-rparen()-code_block()
+    ----
+    for:
+        left: glue:
+            left: expression1
+            right: expression2
+        left: glue:
+            left: expression3
+            right: compound
+
+5. 语句:
+    表达式; 或
+    if/while/for 或
+    变量声明; 或
+    return 表达式; 或
+    ...
+    ----
+    expression()-semicolon()
+    if()
+    while()
+    for()
+    variable_declaration()-semicolon()
+    return()-expression()-semicolon()
+    ----
+    statement: if | while | for | variable_declaration | return | expression
+
+6. 变量声明:<可用: 所有>
+    数据类型 标识符
+    ----
+    type()-identifier()
+    ----
+    variable_declaration(type, identifier): none
+
+7. 表达式:<可用: 函数内部>
+    标识符 = 表达式<返回 表达式的值>
+    表达式 运算符 表达式<返回 运算结果>
+    运算符 表达式(left)<返回 运算结果>
+    &标识符<返回 标识符的地址>
+    (表达式)<返回 表达式的值>
+    标识符<返回 标识符的值>
+    字面量<返回 字面量的值>
+    函数调用<返回 函数调用的返回值>
+
+8. 函数调用:<可用: 函数内部>
+    标识符(表达式, 表达式, ...)
+    ----
+    identifier()-lparen()-expression()-[comma()-expression()]-rparen()
+    ----
+    function_call(identifier):
+        left: expression...
+        right: nullptr
+
+10. 函数声明:<可用: 全局>
+    数据类型 标识符(参数列表) 代码块
+    ----
+    type()-identifier()-lparen()-[type()-identifier()-[comma()-type()-identifier()]]-rparen()-code_block()
+    ----
+    function_declaration(identifier):
+        left: compound
+        right: nullptr
+
+context: 全局
+    合法: 函数声明, 变量声明
+    type()-identifier()
+        semicolon() // variable declaration
+        lparen() // function declaration
+
+context: 函数内部
+    合法: 语句
+    if()/while()/for()
+    return() // return statement
+    type() // variable declaration;
+    <else> // expression;
+
+表达式相关:
+    expression()-operator()-expression()
+    lparen()-expression()-rparen()
+    literal()
+    identifier()
+        lparen()-expression()-rparen() // function call
+        lbracket()-expression()-rbracket() // array subscript
+        <else> // identifier
+    ----
+    operator:<binary>
+        left: expression
+        right: expression
+    literal/variable: leaf
+    function_call:<见上>
+    dereference:
+        left: address
+        right: offset[optional]
+    get_address:
+        left: variable
+        right: nullptr
+    negative/inverse/logical_not/inc/dec:
+        left: expression
+        right: nullptr
