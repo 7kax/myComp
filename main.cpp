@@ -20,16 +20,12 @@ int main(int argc, char **argv) {
     myComp::scanner.next();
 
     // Build trees
-    // ofstream out("tree.txt");
     std::vector<myComp::ASTNode *> nodes;
     while (myComp::scanner.get_token().type != myComp::TokenType::T_EOF) {
         myComp::ASTNode *tree = myComp::Parser::build_tree();
-        if (tree != nullptr) {
-            // myComp::Tree::print(out, parser->get_tree(), 0);
+        if (tree != nullptr)
             nodes.push_back(tree);
-        }
     }
-    // out.close();
 
     // Generate the assembly code
     myComp::generator.generate_preamble();
