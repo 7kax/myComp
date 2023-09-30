@@ -52,7 +52,6 @@ namespace myComp {
         asm_generator->allocate_stack(-this->offset);
 
         Generator::code_block(node->left);
-        // todo: for now we deprecate the parameters
         asm_generator->function_postlude(identifier, offset);
 
         // Pop the context
