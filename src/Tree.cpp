@@ -51,23 +51,23 @@ namespace myComp {
         return left;
     }
 
-    void Tree::print(std::ostream &out, const ASTNode *node, int indent) {
-        for (int i = 0; i < indent; ++i) {
-            out << '\t';
-        }
-
-        out << ASTNode_str.at(node->type)
-            << ": (left: "
-            << (node->left == nullptr ? "null" : ASTNode_str.at(node->left->type))
-            << ", right: "
-            << (node->right == nullptr ? "null" : ASTNode_str.at(node->right->type))
-            << ")\n";
-
-        if (node->left != nullptr)
-            Tree::print(out, node->left, indent + 1);
-        if (node->right != nullptr)
-            Tree::print(out, node->right, indent + 1);
-    }
+    // void Tree::print(std::ostream &out, const ASTNode *node, int indent) {
+    //     for (int i = 0; i < indent; ++i) {
+    //         out << '\t';
+    //     }
+    //
+    //     out << ASTNode_str.at(node->type)
+    //         << ": (left: "
+    //         << (node->left == nullptr ? "null" : ASTNode_str.at(node->left->type))
+    //         << ", right: "
+    //         << (node->right == nullptr ? "null" : ASTNode_str.at(node->right->type))
+    //         << ")\n";
+    //
+    //     if (node->left != nullptr)
+    //         Tree::print(out, node->left, indent + 1);
+    //     if (node->right != nullptr)
+    //         Tree::print(out, node->right, indent + 1);
+    // }
 
     ASTNode *Tree::dereference(ASTNode *address, ASTNode *offset) {
         DataType data_type = address->data_type;

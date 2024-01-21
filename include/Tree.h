@@ -4,7 +4,6 @@
 #include "defs.h"
 
 namespace myComp {
-
     class Tree {
     public:
         static ASTNode *int_literal(int value);
@@ -29,7 +28,7 @@ namespace myComp {
 
         static ASTNode *address(ASTNode *left);
 
-        static void print(std::ostream &out, const ASTNode *node, int indent = 0);
+        // static void print(std::ostream &out, const ASTNode *node, int indent = 0);
 
         static ASTNode *string_literal(const std::string &str);
 
@@ -43,7 +42,6 @@ namespace myComp {
 
         static ASTNode *decrement(ASTNode *node, bool is_prefix);
     };
-
 } // myComp
 
 #endif //MYCOMP_TREE_H

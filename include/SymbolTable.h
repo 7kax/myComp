@@ -4,13 +4,15 @@
 #include "defs.h"
 
 namespace myComp {
-
     class SymbolTable {
     private:
+        // Initially contains item "global" with empty symbol table
         std::map<std::string, Symbol> symbol_table;
 
     public:
         [[nodiscard]] std::map<std::string, Symbol> &get_symbol_table();
+
+        [[nodiscard]] const std::map<std::string, Symbol> &get_symbol_table() const;
 
         void insert(const std::string &name, DataType data_type, int size);
 
@@ -24,7 +26,6 @@ namespace myComp {
 
         [[nodiscard]] int get_offset(const std::string &name) const;
     };
-
 } // myComp
 
 #endif //MYCOMP_SYMBOLTABLE_H

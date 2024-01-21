@@ -7,7 +7,7 @@ namespace myComp {
     class Context {
     private:
         std::stack<ContextNode> context_stack;
-        
+
     public:
         Context();
 
@@ -24,6 +24,10 @@ namespace myComp {
         [[nodiscard]] const std::string &get_end_label() const;
 
         [[nodiscard]] bool is_global() const;
+
+        void set_return_flag();
+
+        [[nodiscard]] bool has_return() const;
     };
 }
 

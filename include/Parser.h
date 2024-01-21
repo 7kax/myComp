@@ -9,8 +9,10 @@
 namespace myComp {
     class Parser {
     private:
+        // Global variables
         static void variable_declaration(DataType data_type, std::string &name);
 
+        // Local variables
         static ASTNode *variable_declaration();
 
         static ASTNode *function_declaration(DataType return_type, const std::string &name);
@@ -30,7 +32,6 @@ namespace myComp {
     public:
         static ASTNode *build_tree();
     };
-
 } // myComp
 
 #endif //MYCOMP_PARSER_H

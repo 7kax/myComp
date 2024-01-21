@@ -23,36 +23,117 @@ namespace myComp {
         // EOF
         T_EOF,
         // Operators
-        PLUS, MINUS, STAR, SLASH, EQUALS, NEQ, LESS, GREATER, LESS_EQ, GREATER_EQ, ASSIGN, AND, LOGICAL_AND,
-        OR, LOGICAL_OR, XOR, L_SHIFT, R_SHIFT, INVERT, NOT, INC, DEC,
+        PLUS,
+        MINUS,
+        STAR,
+        SLASH,
+        EQUALS,
+        NEQ,
+        LESS,
+        GREATER,
+        LESS_EQ,
+        GREATER_EQ,
+        ASSIGN,
+        AND,
+        LOGICAL_AND,
+        OR,
+        LOGICAL_OR,
+        XOR,
+        L_SHIFT,
+        R_SHIFT,
+        INVERT,
+        NOT,
+        INC,
+        DEC,
         // Punctuation
-        SEMI, LBRACE, RBRACE, LPAREN, RPAREN, COMMA, LBRACKET, RBRACKET,
+        SEMI,
+        LBRACE,
+        RBRACE,
+        LPAREN,
+        RPAREN,
+        COMMA,
+        LBRACKET,
+        RBRACKET,
         // Keywords: control flow
-        WHILE, FOR, IF, ELSE, RETURN,
+        WHILE,
+        FOR,
+        IF,
+        ELSE,
+        RETURN,
         // Keywords: data types
-        INT_LITERAL, INT, CHAR, VOID, LONG, STRING_LITERAL,
+        INT_LITERAL,
+        INT,
+        CHAR,
+        VOID,
+        LONG,
+        STRING_LITERAL,
         // Identifier
         IDENTIFIER,
     };
+
     // AST node types
     enum class ASTNodeType {
         // Operators
-        ADD, SUBTRACT, MULTIPLY, DIVIDE, EQUALS, NEQ, LESS, GREATER, LESS_EQ, GREATER_EQ, ADDRESS, DEREFERENCE,
-        OR, LOGICAL_OR, AND, LOGICAL_AND, XOR, L_SHIFT, R_SHIFT, INVERT, NOT, POST_INC, POST_DEC, PRE_INC, PRE_DEC,
+        ADD,
+        SUBTRACT,
+        MULTIPLY,
+        DIVIDE,
+        EQUALS,
+        NEQ,
+        LESS,
+        GREATER,
+        LESS_EQ,
+        GREATER_EQ,
+        ADDRESS,
+        DEREFERENCE,
+        OR,
+        LOGICAL_OR,
+        AND,
+        LOGICAL_AND,
+        XOR,
+        L_SHIFT,
+        R_SHIFT,
+        INVERT,
+        NOT,
+        POST_INC,
+        POST_DEC,
+        PRE_INC,
+        PRE_DEC,
         NEGATIVE,
         // Statements
-        ASSIGN, VARIABLE_DECLARATION,
+        ASSIGN,
+        VARIABLE_DECLARATION,
         // Control flow
-        COMPOUND, IF, ELSE, WHILE, FOR, GLUE, RETURN,
+        COMPOUND,
+        IF,
+        ELSE,
+        WHILE,
+        FOR,
+        GLUE,
+        RETURN,
         // Functions
-        FUNCTION_DECLARATION, VARIABLE, WIDEN, INT_LITERAL, FUNCTION_CALL,
-        SCALE, STRING_LITERAL,
+        FUNCTION_DECLARATION,
+        VARIABLE,
+        WIDEN,
+        INT_LITERAL,
+        FUNCTION_CALL,
+        SCALE,
+        STRING_LITERAL,
     };
+
     // Data types
     enum class DataType {
-        NONE, INT, CHAR, VOID, LONG,
-        INT_PTR, CHAR_PTR, VOID_PTR, LONG_PTR
+        NONE,
+        INT,
+        CHAR,
+        VOID,
+        LONG,
+        INT_PTR,
+        CHAR_PTR,
+        VOID_PTR,
+        LONG_PTR
     };
+
     // Context types
     enum class ContextType {
         GLOBAL,
@@ -109,7 +190,9 @@ namespace myComp {
         ContextType type;
         std::string name;
         std::string end_label;
+        bool has_return = false;
     };
+
     // Symbol struct
     struct Symbol {
         DataType data_type = DataType::NONE;

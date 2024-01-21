@@ -5,18 +5,24 @@
 #include "x_86.h"
 
 namespace myComp {
-    const std::vector<std::string> x_86::registers = {"%r10", "%r11", "%r12", "%r13",
-                                                      "%r9", "%r8", "%rcx", "%rdx", "%rsi", "%rdi"};
-    const std::vector<std::string> x_86::b_registers = {"%r10b", "%r11b", "%r12b", "%r13b",
-                                                        "%r9b", "%r8b", "%cl", "%dl", "%sil", "%dil"};
-    const std::vector<std::string> x_86::d_registers = {"%r10d", "%r11d", "%r12d", "%r13d",
-                                                        "%r9d", "%r8d", "%ecx", "%edx", "%esi", "%edi"};
+    const std::vector<std::string> x_86::registers = {
+        "%r10", "%r11", "%r12", "%r13",
+        "%r9", "%r8", "%rcx", "%rdx", "%rsi", "%rdi"
+    };
+    const std::vector<std::string> x_86::b_registers = {
+        "%r10b", "%r11b", "%r12b", "%r13b",
+        "%r9b", "%r8b", "%cl", "%dl", "%sil", "%dil"
+    };
+    const std::vector<std::string> x_86::d_registers = {
+        "%r10d", "%r11d", "%r12d", "%r13d",
+        "%r9d", "%r8d", "%ecx", "%edx", "%esi", "%edi"
+    };
 
     // Compare 2 registers
     int x_86::compare_registers(int r1, int r2, const std::string &op) {
         x_86::output << "\tcmpq\t" << registers[r2] << ", " << registers[r1] << "\n"
-                     << "\t" << op << "\t" << b_registers[r1] << "\n"
-                     << "\tmovzbq\t" << b_registers[r1] << ", " << registers[r1] << "\n";
+                << "\t" << op << "\t" << b_registers[r1] << "\n"
+                << "\tmovzbq\t" << b_registers[r1] << ", " << registers[r1] << "\n";
         x_86::free_register(r2);
         return r1;
     }
@@ -35,15 +41,16 @@ namespace myComp {
         x_86::output << "\t.text\n";
     }
 
-    void x_86::postlude() {}
+    void x_86::postlude() {
+    }
 
     void x_86::function_prelude(const std::string &name) {
         x_86::output << "\t.text\n"
-                     << "\t.globl\t" << name << "\n"
-                     << "\t.type\t" << name << ", @function\n"
-                     << name << ":\n"
-                     << "\tpushq\t%rbp\n"
-                     << "\tmovq\t%rsp, %rbp\n";
+                << "\t.globl\t" << name << "\n"
+                << "\t.type\t" << name << ", @function\n"
+                << name << ":\n"
+                << "\tpushq\t%rbp\n"
+                << "\tmovq\t%rsp, %rbp\n";
     }
 
     void x_86::function_postlude(const std::string &name, int offset) {
@@ -51,8 +58,8 @@ namespace myComp {
         x_86::label(context.get_end_label());
         // Restore stack pointer
         x_86::output << "\taddq\t$" << -offset << ", %rsp\n"
-                     << "\tpopq\t%rbp\n"
-                     << "\tret\n";
+                << "\tpopq\t%rbp\n"
+                << "\tret\n";
     }
 
     // Register management
@@ -96,15 +103,15 @@ namespace myComp {
     int x_86::load_symbol(const std::string &name) {
         int reg = x_86::allocate_register();
         std::string location = x_86::variable_location(name);
-        if ((symbol_tables[context.get_name()].contains(name) ?
-             symbol_tables[context.get_name()].get_size(name) :
-             symbol_tables["global"].get_size(name)) == 1)
+        if ((symbol_tables[context.get_name()].contains(name)
+                 ? symbol_tables[context.get_name()].get_size(name)
+                 : symbol_tables["global"].get_size(name)) == 1)
             switch (Type::get_data_type(name)) {
-                case DataType::INT:
+                case DataType::CHAR:
                     x_86::output << "\tmovsbq\t" << location << ", " << registers[reg] << "\n";
                     break;
-                case DataType::CHAR:
-                    x_86::output << "\tmovzbq\t" << location << ", " << registers[reg] << "\n";
+                case DataType::INT:
+                    x_86::output << "\tmovslq\t" << location << ", " << registers[reg] << "\n";
                     break;
                 case DataType::LONG:
                 case DataType::CHAR_PTR:
@@ -195,10 +202,10 @@ namespace myComp {
     int x_86::dereference(int reg, DataType data_type) {
         switch (data_type) {
             case DataType::CHAR:
-                x_86::output << "\tmovzbq\t" << "(" << registers[reg] << "), " << registers[reg] << "\n";
+                x_86::output << "\tmovsbq\t" << "(" << registers[reg] << "), " << registers[reg] << "\n";
                 break;
             case DataType::INT:
-                x_86::output << "\tmovzbl\t" << "(" << registers[reg] << "), " << registers[reg] << "\n";
+                x_86::output << "\tmovslq\t" << "(" << registers[reg] << "), " << registers[reg] << "\n";
                 break;
             case DataType::LONG:
                 x_86::output << "\tmovq\t" << "(" << registers[reg] << "), " << registers[reg] << "\n";
@@ -214,18 +221,18 @@ namespace myComp {
         int data_size = Type::data_size.at(data_type);
         switch (data_size) {
             case 1:
-                x_86::output << "\tmovzbq\t" << "(" << registers[address_reg] << ", " << registers[offset_reg]
-                             << ", 1), "
-                             << registers[reg] << "\n";
+                x_86::output << "\tmovsbq\t" << "(" << registers[address_reg] << ", " << registers[offset_reg]
+                        << ", 1), "
+                        << registers[reg] << "\n";
                 break;
             case 4:
-                x_86::output << "\tmovzbl\t" << "(" << registers[address_reg] << ", " << registers[offset_reg]
-                             << ", 4), "
-                             << registers[reg] << "\n";
+                x_86::output << "\tmovslq\t" << "(" << registers[address_reg] << ", " << registers[offset_reg]
+                        << ", 4), "
+                        << registers[reg] << "\n";
                 break;
             case 8:
                 x_86::output << "\tmovq\t" << "(" << registers[address_reg] << ", " << registers[offset_reg] << ", 8), "
-                             << registers[reg] << "\n";
+                        << registers[reg] << "\n";
                 break;
             default:
                 Errors::fatal_error("invalid data size");
@@ -256,9 +263,9 @@ namespace myComp {
 
     int x_86::div(int r1, int r2) {
         x_86::output << "\tmovq\t" << registers[r1] << ", %rax\n"
-                     << "\tcqo\n"
-                     << "\tidivq\t" << registers[r2] << "\n"
-                     << "\tmovq\t%rax, " << registers[r1] << "\n";
+                << "\tcqo\n"
+                << "\tidivq\t" << registers[r2] << "\n"
+                << "\tmovq\t%rax, " << registers[r1] << "\n";
         x_86::free_register(r2);
         return r1;
     }
@@ -291,7 +298,7 @@ namespace myComp {
 
     void x_86::jump_zero(int reg, const std::string &label) {
         x_86::output << "\ttestq\t" << registers[reg] << ", " << registers[reg] << "\n"
-                     << "\tjz\t" << label << "\n";
+                << "\tjz\t" << label << "\n";
         x_86::free_register(reg);
     }
 
@@ -302,7 +309,7 @@ namespace myComp {
     int x_86::call(const std::string &name) {
         x_86::output << "\tcall\t" << name << "\n";
         // Remove parameters from stack
-        if (int size = static_cast<int>(function.get_prototype(name).parameters.size());size > 6)
+        if (int size = static_cast<int>(function.get_prototype(name).parameters.size()); size > 6)
             x_86::output << "\taddq\t$" << (size - 6) * 8 << ", %rsp\n";
         if (function.get_prototype(name).return_type == DataType::VOID) {
             return -1;
@@ -359,8 +366,8 @@ namespace myComp {
 
     int x_86::NOT(int reg) {
         x_86::output << "\ttestq\t" << registers[reg] << ", " << registers[reg] << "\n"
-                     << "\tsete\t" << b_registers[reg] << "\n"
-                     << "\tmovzbq\t" << b_registers[reg] << ", " << registers[reg] << "\n";
+                << "\tsete\t" << b_registers[reg] << "\n"
+                << "\tmovzbq\t" << b_registers[reg] << ", " << registers[reg] << "\n";
         return reg;
     }
 
@@ -440,14 +447,14 @@ namespace myComp {
 
     int x_86::left_shift(int r1, int r2) {
         x_86::output << "\tmovb\t" << b_registers[r2] << ", %cl\n"
-                     << "\tshlq\t%cl, " << registers[r1] << "\n";
+                << "\tshlq\t%cl, " << registers[r1] << "\n";
         x_86::free_register(r2);
         return r1;
     }
 
     int x_86::right_shift(int r1, int r2) {
         x_86::output << "\tmovb\t" << b_registers[r2] << ", %cl\n"
-                     << "\tshrq\t%cl, " << registers[r1] << "\n";
+                << "\tshrq\t%cl, " << registers[r1] << "\n";
         x_86::free_register(r2);
         return r1;
     }

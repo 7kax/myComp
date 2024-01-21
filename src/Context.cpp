@@ -3,7 +3,6 @@
 #include "data.h"
 
 namespace myComp {
-
     void Context::push(const std::string &name) {
         this->context_stack.emplace(ContextType::FUNCTION, name, "");
     }
@@ -34,5 +33,13 @@ namespace myComp {
 
     bool Context::is_global() const {
         return this->context_stack.top().type == ContextType::GLOBAL;
+    }
+
+    void Context::set_return_flag() {
+        this->context_stack.top().has_return = true;
+    }
+
+    bool Context::has_return() const {
+        return this->context_stack.top().has_return == true;
     }
 }

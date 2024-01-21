@@ -28,31 +28,31 @@ namespace myComp {
     }
 
     void Generator::function_declaration(const ASTNode *node) {
-        std::string identifier = node->string;
+        const std::string &function_name = node->string;
 
         // Set the context to function
-        context.push(identifier, Generator::get_label());
+        context.push(function_name, Generator::get_label());
 
-        asm_generator->function_prelude(identifier);
+        asm_generator->function_prelude(function_name);
 
         // Move the parameters in registers to the stack
-        const std::vector<parameter> &parameters = function.get_prototype(identifier).parameters;
+        const std::vector<parameter> &parameters = function.get_prototype(function_name).parameters;
         this->offset = asm_generator->move_parameters(parameters);
 
         // Allocate space for local variables
-        for (auto &[name, symbol]: symbol_tables[identifier].get_symbol_table()) {
+        for (auto &[name, symbol]: symbol_tables[function_name].get_symbol_table()) {
             // Skip the parameters
             if (symbol.offset != 0)
                 continue;
             int length = Type::data_size.at(symbol.data_type) * symbol.size;
-            length = (length / 4 + 1) * 4;
+            length = (length / 16 + 1) * 16;
             this->offset -= length;
-            symbol_tables[identifier].set_offset(name, this->offset);
+            symbol_tables[function_name].set_offset(name, this->offset);
         }
         asm_generator->allocate_stack(-this->offset);
 
         Generator::code_block(node->left);
-        asm_generator->function_postlude(identifier, offset);
+        asm_generator->function_postlude(function_name, offset);
 
         // Pop the context
         context.pop();
@@ -139,7 +139,8 @@ namespace myComp {
         asm_generator->label(end_label);
     }
 
-    void Generator::variable_declaration(const ASTNode *node) {}
+    void Generator::variable_declaration(const ASTNode *node) {
+    }
 
     void Generator::RETURN(const ASTNode *node) {
         if (context.get_type() != ContextType::FUNCTION)

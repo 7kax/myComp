@@ -13,5 +13,6 @@
 #include "Tree.h"
 #include "Type.h"
 #include "Errors.h"
+#include "Debugger.h"
 
 #endif //MYCOMP_OBJECTS_H

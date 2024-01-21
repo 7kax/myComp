@@ -16,11 +16,16 @@ namespace myComp {
             scanner.next();
             ASTNode *right = Expression::build_tree(precedence.at(operator_type));
 
+            // Do some type checking
             if (left->data_type == DataType::VOID || right->data_type == DataType::VOID)
                 Errors::syntax_error("void value not ignored", scanner.get_line());
             if (Type::is_pointer(left->data_type) && Type::is_pointer(right->data_type) &&
                 left->data_type != right->data_type)
                 Errors::syntax_error("pointer type mismatch", scanner.get_line());
+            if (Type::is_pointer(left->data_type) && Type::is_pointer(right->data_type) && operator_type ==
+                ASTNodeType::ADD)
+                Errors::syntax_error("invalid operands to binary +", scanner.get_line());
+
             if (Type::is_integer(left->data_type) && Type::is_integer(right->data_type))
                 Type::integer_widen(left, right);
             else if (Type::is_pointer(left->data_type) && Type::is_integer(right->data_type))
@@ -39,7 +44,7 @@ namespace myComp {
     }
 
     ASTNode *Expression::primary() {
-        if (ASTNode *prefix = Expression::prefix();prefix != nullptr)
+        if (ASTNode *prefix = Expression::prefix(); prefix != nullptr)
             return prefix;
         TokenType token_type = scanner.get_token().type;
         int val;
@@ -130,6 +135,10 @@ namespace myComp {
         TokenType token_type = scanner.get_token().type;
         switch (token_type) {
             case TokenType::LPAREN:
+                // Ensure the function prototype exists
+                if (!function.is_declared(str))
+                    Errors::syntax_error("function " + str + " is not declared", scanner.get_line());
+
                 scanner.lparen();
                 node = Expression::parameters(str);
                 scanner.rparen();
@@ -140,7 +149,7 @@ namespace myComp {
                 scanner.rbracket();
                 return Tree::dereference(Tree::variable(str), node);
             default:
-                if (ASTNode *postfix = Expression::postfix(str);postfix != nullptr)
+                if (ASTNode *postfix = Expression::postfix(str); postfix != nullptr)
                     return postfix;
                 return Tree::variable(str);
         }

@@ -4,7 +4,6 @@
 #include "defs.h"
 
 namespace myComp {
-
     class Expression {
     private:
         // Primary expression
@@ -26,7 +25,6 @@ namespace myComp {
         // Build the AST
         static ASTNode *build_tree(int pre_precedence);
     };
-
 } // myComp
 
 #endif //MYCOMP_EXPRESSION_H

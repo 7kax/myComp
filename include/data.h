@@ -2,6 +2,9 @@
 #define MYCOMP_DATA_H
 
 namespace myComp {
+    // Debug flag
+    extern bool debug;
+
     // Convert token to data type
     extern const std::map<TokenType, DataType> token_to_data;
 
@@ -22,6 +25,9 @@ namespace myComp {
 
     // Convert a token type to a string
     extern const std::map<TokenType, const char *> token_str;
+
+    // Convert a data type to a string
+    extern const std::map<DataType, const char *> data_type_str;
 
     // String literals
     extern std::map<std::string, std::string> string_literals;

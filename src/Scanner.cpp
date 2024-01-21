@@ -4,17 +4,17 @@
 
 namespace myComp {
     const std::map<std::string, TokenType> Scanner::keywords = {
-            // Types
-            {"void",   TokenType::VOID},
-            {"int",    TokenType::INT},
-            {"char",   TokenType::CHAR},
-            {"long",   TokenType::LONG},
-            // Control flow
-            {"if",     TokenType::IF},
-            {"else",   TokenType::ELSE},
-            {"while",  TokenType::WHILE},
-            {"for",    TokenType::FOR},
-            {"return", TokenType::RETURN},
+        // Types
+        {"void", TokenType::VOID},
+        {"int", TokenType::INT},
+        {"char", TokenType::CHAR},
+        {"long", TokenType::LONG},
+        // Control flow
+        {"if", TokenType::IF},
+        {"else", TokenType::ELSE},
+        {"while", TokenType::WHILE},
+        {"for", TokenType::FOR},
+        {"return", TokenType::RETURN},
     };
 
     void Scanner::set_input(const std::string &filename) {
@@ -165,7 +165,7 @@ namespace myComp {
                     return;
                 }
 
-                // If the first character is a letter or underscore, scan the identifier
+            // If the first character is a letter or underscore, scan the identifier
                 if (std::isalpha(ch) || ch == '_') {
                     this->token.string = scan_identifier(ch);
 
@@ -178,8 +178,8 @@ namespace myComp {
                     return;
                 }
         }
-        // If we reach here, there is an error
-        exit(1);
+        // If we reach here, there is an unrecognized token
+        Errors::syntax_error("unrecognized token " + std::string(1, ch), this->line);
     }
 
     char Scanner::skip_white_space() {
@@ -247,8 +247,8 @@ namespace myComp {
     void Scanner::match(TokenType expected, const char *name) {
         if (this->token.type != expected) {
             std::cerr << "Syntax error: expected " << name << " but got token " << token_str.at(this->token.type)
-                      << " on line "
-                      << this->line << '\n';
+                    << " on line "
+                    << this->line << '\n';
             exit(1);
         }
         // Get the next token

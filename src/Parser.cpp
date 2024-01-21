@@ -77,7 +77,11 @@ namespace myComp {
             // Update the parameter list
             std::vector<parameter> &parameters = function.get_prototype(name).parameters;
             for (auto &parameter: parameters) {
-                assert(scanner.next_data_type() == parameter.type);
+                // assert(scanner.next_data_type() == parameter.type);
+                if (scanner.next_data_type() != parameter.type) {
+                    Errors::syntax_error("type doesn't match prototype for parameter: " +
+                                         parameter.name + " in function " + name, scanner.get_line());
+                }
                 if (scanner.get_token().type == TokenType::IDENTIFIER)
                     parameter.name = scanner.next_string();
                 if (scanner.get_token().type != TokenType::RPAREN)
@@ -110,10 +114,23 @@ namespace myComp {
             assert(!parameter.name.empty());
             symbol_tables[name].insert(parameter.name, parameter.type, 1);
         }
+
         // Build the tree
         context.push(name);
         ASTNode *tree = Parser::code_block();
+
+        // Ensure non-void functions have a return statement
+        if (return_type != DataType::VOID && !context.has_return()) {
+            Errors::fatal_error("function " + name + " has no return statement");
+        }
+
+        // Ensure void functions don't have a return statement
+        if (return_type == DataType::VOID && context.has_return()) {
+            Errors::fatal_error("can't return a value from a void function " + name);
+        }
+
         context.pop();
+
         return Tree::function_declaration(name, tree);
     }
 
@@ -210,6 +227,13 @@ namespace myComp {
         ASTNode *node = Expression::build_tree(20);
 
         scanner.semi();
+
+        // Check if the return type matches the function type
+        if (!Type::convertable_to(node->data_type, function.get_prototype(context.get_name()).return_type))
+            Errors::fatal_error("return type mismatch in function " + context.get_name());
+
+        // Set the return flag
+        context.set_return_flag();
 
         return Tree::unary(ASTNodeType::RETURN, node);
     }
