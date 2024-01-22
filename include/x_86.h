@@ -6,157 +6,169 @@
 #include "AsmGenerator.h"
 
 namespace myComp {
-    class x_86 : public AsmGenerator {
-    private:
-        // The output file
-        std::ofstream output;
+class x_86 final : public AsmGenerator {
+private:
+  // The output file
+  std::ofstream output;
 
-        // List of registers
-        static const std::vector<std::string> registers;
+  // List of registers
+  static const std::vector<std::string> registers;
 
-        // Number of registers
-        static constexpr int num_registers = 10;
+  // Number of registers
+  static constexpr int num_registers = 10;
 
-        // List of b-register
-        static const std::vector<std::string> b_registers;
+  // List of b-register
+  static const std::vector<std::string> b_registers;
 
-        // List of d-register
-        static const std::vector<std::string> d_registers;
+  // List of d-register
+  static const std::vector<std::string> d_registers;
 
-        // List of available registers
-        std::vector<bool> free_registers;
+  // List of available registers
+  std::vector<bool> free_registers;
 
-        // Compare 2 registers
-        int compare_registers(int r1, int r2, const std::string &op);
+  // Compare 2 registers
+  int compare_registers(int r1, int r2, std::string_view op);
 
-        // Get the location of a symbol
-        static std::string variable_location(const std::string &identifier);
+  // Get the location of a symbol
+  static std::string variable_location(std::string_view identifier);
 
-    public:
-        int move_parameters(const std::vector<parameter> &params) override;
+public:
+  int move_parameters(const std::vector<parameter> &params) override;
 
-        // Constructor
-        x_86() : free_registers(num_registers, true) {}
+  // Constructor
+  x_86() : free_registers(num_registers, true) {}
 
-        // Set the output file
-        void set_output(const std::string &filename) override;
+  // Set the output file
+  void set_output(std::string_view filename) override;
 
-        // prelude and postlude
-        void prelude() override;
+  // prelude and postlude
+  void prelude() override;
 
-        void postlude() override;
+  void postlude() override;
 
-        void function_prelude(const std::string &name) override;
+  void function_prelude(std::string_view name) override;
 
-        void function_postlude(const std::string &name, int offset) override;
+  void function_postlude(std::string_view name, int offset) override;
 
-        void allocate_stack(int amount) override;
+  void allocate_stack(int amount) override;
 
-        // Register management
-        void free_all_registers() override;
+  // Register management
+  void free_all_registers() override;
 
-        int allocate_register() override;
+  int allocate_register() override;
 
-        void free_register(int reg) override;
+  void free_register(int reg) override;
 
-        void copy_argument(int src, int num_arg) override;
+  void copy_argument(int src, int num_arg) override;
 
-        int widen_integer(int reg, DataType src, DataType dest) override;
+  int widen_integer(int reg, Type_ *src, Type_ *dest) override;
 
-        int scale_integer(int reg, int val) override;
+  int scale_integer(int reg, int val) override;
 
-        // Memory management
-        int load_integer(int value) override;
+  // Memory management
+  int load_integer(int value) override;
 
-        int load_string(const std::string &label) override;
+  int load_string(std::string_view label) override;
 
-        int load_symbol(const std::string &name) override;
+  int load_symbol(std::string_view name) override;
 
-        void allocate_global_symbol(const std::string &name) override;
+  void allocate_global_symbol(std::string_view name) override;
 
-        int invert(int reg) override;
+  int invert(int reg) override;
 
-        int NOT(int reg) override;
+  int NOT(int reg) override;
 
-        int post_increment(const std::string &name) override;
+  int post_increment(std::string_view name) override;
 
-        int pre_increment(const std::string &name) override;
+  int pre_increment(std::string_view name) override;
 
-        int pre_decrement(const std::string &name) override;
+  int pre_decrement(std::string_view name) override;
 
-        int negative(int reg) override;
+  int negative(int reg) override;
 
-        int post_decrement(const std::string &name) override;
+  int post_decrement(std::string_view name) override;
 
-        int OR(int r1, int r2) override;
+  int OR(int r1, int r2) override;
 
-        int AND(int r1, int r2) override;
+  int AND(int r1, int r2) override;
 
-        int XOR(int r1, int r2) override;
+  int XOR(int r1, int r2) override;
 
-        int logical_or(int r1, int r2) override;
+  int logical_or(int r1, int r2) override;
 
-        int logical_and(int r1, int r2) override;
+  int logical_and(int r1, int r2) override;
 
-        int left_shift(int r1, int r2) override;
+  int left_shift(int r1, int r2) override;
 
-        int right_shift(int r1, int r2) override;
+  int right_shift(int r1, int r2) override;
 
-        void allocate_string_literal(const std::string &str, const std::string &label) override;
+  void allocate_string_literal(std::string_view str,
+                               std::string_view label) override;
 
-        int store_symbol(int reg, const std::string &name) override;
+  int store_symbol(int reg, std::string_view name) override;
 
-        int store_address(int address_reg, int val_reg, DataType data_type) override;
+  int store_address(int address_reg, int val_reg, Type_ *data_type);
 
-        int load_address(const std::string &name) override;
+  int load_address(std::string_view name) override;
 
-        int dereference(int reg, DataType data_type) override;
+  int dereference(int reg, Type_ *data_type) override;
 
-        int dereference(int address_reg, int offset_reg, DataType data_type) override;
+  int dereference(int address_reg, int offset_reg, Type_ *data_type) override;
 
-        // Arithmetic operations
-        int add(int r1, int r2) override;
+  // Arithmetic operations
+  int add(int r1, int r2) override;
 
-        int sub(int r1, int r2) override;
+  int sub(int r1, int r2) override;
 
-        int mul(int r1, int r2) override;
+  int mul(int r1, int r2) override;
 
-        int div(int r1, int r2) override;
+  int div(int r1, int r2) override;
 
-        int equal(int r1, int r2) override { return this->compare_registers(r1, r2, "sete"); }
+  int equal(const int r1, const int r2) override {
+    return this->compare_registers(r1, r2, "sete");
+  }
 
-        int not_equal(int r1, int r2) override { return this->compare_registers(r1, r2, "setne"); }
+  int not_equal(const int r1, const int r2) override {
+    return this->compare_registers(r1, r2, "setne");
+  }
 
-        int less(int r1, int r2) override { return this->compare_registers(r1, r2, "setl"); }
+  int less(const int r1, const int r2) override {
+    return this->compare_registers(r1, r2, "setl");
+  }
 
-        int less_equal(int r1, int r2) override { return this->compare_registers(r1, r2, "setle"); }
+  int less_equal(const int r1, const int r2) override {
+    return this->compare_registers(r1, r2, "setle");
+  }
 
-        int greater(int r1, int r2) override { return this->compare_registers(r1, r2, "setg"); }
+  int greater(const int r1, const int r2) override {
+    return this->compare_registers(r1, r2, "setg");
+  }
 
-        int greater_equal(int r1, int r2) override { return this->compare_registers(r1, r2, "setge"); }
+  int greater_equal(const int r1, const int r2) override {
+    return this->compare_registers(r1, r2, "setge");
+  }
 
-        int assign(const std::string &name, int reg) override;
+  int assign(std::string_view name, int reg) override;
 
-        int assign(int address_reg, int val_reg, DataType data_type) override;
+  int assign(int address_reg, int val_reg, Type_ *data_type) override;
 
-        int assign(int address_reg, int offset_reg, int val_reg, DataType data_type) override;
+  int assign(int address_reg, int offset_reg, int val_reg,
+             Type_ *data_type) override;
 
-        // Control flow operations
-        void jump(const std::string &label) override;
+  // Control flow operations
+  void jump(std::string_view label) override;
 
-        void jump_zero(int reg, const std::string &label) override;
+  void jump_zero(int reg, std::string_view label) override;
 
-        void label(const std::string &label) override;
+  void label(std::string_view label) override;
 
-        int call(const std::string &name) override;
+  int call(std::string_view name) override;
 
-        void RETURN(int reg) override;
+  void RETURN(int reg) override;
 
-        // Destructor: close the output file
-        ~x_86() override { output.close(); }
+  // Destructor: close the output file
+  ~x_86() override { output.close(); }
+};
+} // namespace myComp
 
-    };
-}
-
-
-#endif //MYCOMP_X_86_H
+#endif // MYCOMP_X_86_H

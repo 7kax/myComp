@@ -6,7 +6,10 @@ namespace myComp {
     extern bool debug;
 
     // Convert token to data type
-    extern const std::map<TokenType, DataType> token_to_data;
+    // extern const std::map<TokenType, DataType> token_to_data;
+
+    // Data type in tokens
+    extern const std::set<TokenType> data_types;
 
     // Precedence of operators
     extern const std::map<ASTNodeType, int> precedence;
@@ -15,10 +18,10 @@ namespace myComp {
     extern const std::map<TokenType, ASTNodeType> token_to_op;
 
     // Convert a data type to a pointer data type
-    extern const std::map<DataType, DataType> data_to_ptr;
+    // extern const std::map<DataType, DataType> data_to_ptr;
 
     // Convert a pointer data type to a data type
-    extern const std::map<DataType, DataType> ptr_to_data;
+    // extern const std::map<DataType, DataType> ptr_to_data;
 
     // Convert an AST node type to a string
     extern const std::map<ASTNodeType, const char *> ASTNode_str;
@@ -27,7 +30,10 @@ namespace myComp {
     extern const std::map<TokenType, const char *> token_str;
 
     // Convert a data type to a string
-    extern const std::map<DataType, const char *> data_type_str;
+    // extern const std::map<DataType, const char *> data_type_str;
+
+    // Info of data types
+    // extern const std::map<DataType, TypeInfo> data_type_info;
 
     // String literals
     extern std::map<std::string, std::string> string_literals;
@@ -49,6 +55,9 @@ namespace myComp {
 
     // Context
     extern Context context;
-}
 
-#endif //MYCOMP_DATA_H
+    // Type factory
+    // extern TypeFactory type_factory;
+} // namespace myComp
+
+#endif // MYCOMP_DATA_H

@@ -127,3 +127,9 @@ context: 函数内部
     negative/inverse/logical_not/inc/dec:
         left: expression
         right: nullptr
+
+symbol的设计:
+    分为全局和局部
+    全局: 变量名, 数据类型, 数据大小, 数据地址
+    局部: 变量名, 数据类型, 数据大小, 栈内偏移量
+    接口:

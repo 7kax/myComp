@@ -4,27 +4,27 @@
 #include "defs.h"
 
 namespace myComp {
-    class Expression {
-    private:
-        // Primary expression
-        static ASTNode *primary();
+  class Expression {
+  private:
+    static ASTNode *primary();
 
-        // Prefix expression
-        static ASTNode *prefix();
+    static ASTNode *prefix();
 
-        // Build tree for parameters
-        static ASTNode *parameters(const std::string &name);
+    static ASTNode *identifier();
 
-        // deal with identifier
-        static ASTNode *identifier();
+    static ASTNode *postfix(const std::string &identifier);
 
-        // deal with postfix operators
-        static ASTNode *postfix(const std::string &identifier);
+    static ASTNode *parameters(const std::string &name);
 
-    public:
-        // Build the AST
-        static ASTNode *build_tree(int pre_precedence);
-    };
-} // myComp
+    // Widen the integer type
+    static void integer_widen(ASTNode *&left, ASTNode *&right);
 
-#endif //MYCOMP_EXPRESSION_H
+    static void integer_scale(ASTNode *&pointer, ASTNode *&integer);
+
+  public:
+    // Build the AST
+    static ASTNode *build_tree(int pre_precedence);
+  };
+} // namespace myComp
+
+#endif // MYCOMP_EXPRESSION_H

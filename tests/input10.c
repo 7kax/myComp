@@ -6,5 +6,5 @@ void main()
   i= 10; printint(i);
 
   for (i= 1;   i <= 5; i= i + 1) { printint(i); }
-  for (j= 253; j != 2; j= j + 1) { printint(j); }
+  for (j= -2; j != 2; j= j + 1) { printint(j); }
 }
