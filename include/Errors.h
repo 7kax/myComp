@@ -9,7 +9,7 @@ namespace myComp {
         // Error message
         static void syntax_error(const std::string &msg, int line);
 
-        static void unexpected_token(TokenType token_type, int line);
+        static void unexpected_token(Token *token, int line);
 
         static void expected(const std::string &msg, int line);
 

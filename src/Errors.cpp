@@ -7,11 +7,11 @@ namespace myComp {
         throw std::runtime_error("Syntax error: " + msg + " on line " + std::to_string(line));
     }
 
-    void Errors::unexpected_token(const TokenType token_type, const int line) {
+    void Errors::unexpected_token(Token *token, const int line) {
         // std::cerr << "Syntax error: unexpected token: " << token_str.at(token_type) << " on line " << line << '\n';
         // exit(1);
         throw std::runtime_error(
-            "Syntax error: unexpected token: " + std::string(token_str.at(token_type)) + " on line " +
+            "Syntax error: unexpected token: " + token->str() + " on line " +
             std::to_string(line));
     }
 

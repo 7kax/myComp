@@ -23,3 +23,13 @@
     - 新的类型系统区分了有无符号整数
     - 新的类型系统支持复杂指针类型
 - 新增`Utils`文件, 用于存放一些工具函数
+
+## 2024-01-23
+
+- 调整了Token系统, 在枚举类型的基础上做了拓展, 应用了享元模式
+- 删除了全局对象`scanner`
+- 新增了`TokenProcessor`类, 用于预读取所有Token
+    - 该类内置一个`Scanner`对象, 用于读取Token
+    - 该类将Token存储在`vector`中, 并提供了`peek`和`next`方法
+    - `Parser`与`Expression`类将使用该类, 而不是直接使用`Scanner`
+    - 该类可以将Token序列写入文件, 用于调试(`token.txt`)

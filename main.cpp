@@ -1,3 +1,5 @@
+#define F_DEBUG
+
 #include "defs.h"
 #include "objects.h"
 #include "data.h"
@@ -20,16 +22,28 @@ int main(int argc, char **argv) {
 
         // Initialize
         myComp::Init::init();
-        myComp::scanner.set_input(argv[1]);
-        myComp::asm_generator->set_output("out.s");
 
-        // Scan the first token
-        myComp::scanner.next();
+        myComp::TokenProcessor token_processor;
+        token_processor.set_input(argv[1]);
+        token_processor.process();
+        if (myComp::debug) {
+            ofstream out("tokens.txt");
+            token_processor.print(out);
+        }
+
+        myComp::Expression expression;
+        expression.set_processor(&token_processor);
+
+        myComp::Parser parser;
+        parser.set_processor(&token_processor);
+        parser.set_expression(&expression);
+
+        myComp::asm_generator->set_output("out.s");
 
         // Build trees
         std::vector<myComp::ASTNode *> nodes;
-        while (myComp::scanner.get_token().type != myComp::TokenType::T_EOF) {
-            myComp::ASTNode *tree = myComp::Parser::build_tree();
+        while (!token_processor.eof()) {
+            myComp::ASTNode *tree = parser.build_tree();
             if (tree != nullptr) {
                 nodes.push_back(tree);
             }

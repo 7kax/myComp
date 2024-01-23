@@ -13,7 +13,7 @@
 #include "Scanner.h"
 #include "SymbolTable.h"
 #include "Tree.h"
-// #include "Type.h"
 #include "Utils.h"
+#include "TokenProcessor.h"
 
 #endif // MYCOMP_OBJECTS_H

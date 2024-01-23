@@ -18,61 +18,9 @@
 #include <vector>
 
 #include "Type.h"
+#include "Token.h"
 
 namespace myComp {
-  // Token types
-  enum class TokenType {
-    // EOF
-    T_EOF,
-    // Operators
-    PLUS,
-    MINUS,
-    STAR,
-    SLASH,
-    EQUALS,
-    NEQ,
-    LESS,
-    GREATER,
-    LESS_EQ,
-    GREATER_EQ,
-    ASSIGN,
-    AND,
-    LOGICAL_AND,
-    OR,
-    LOGICAL_OR,
-    XOR,
-    L_SHIFT,
-    R_SHIFT,
-    INVERT,
-    NOT,
-    INC,
-    DEC,
-    // Punctuation
-    SEMI,
-    LBRACE,
-    RBRACE,
-    LPAREN,
-    RPAREN,
-    COMMA,
-    LBRACKET,
-    RBRACKET,
-    // Keywords: control flow
-    WHILE,
-    FOR,
-    IF,
-    ELSE,
-    RETURN,
-    // Keywords: data types
-    INT_LITERAL,
-    INT,
-    CHAR,
-    VOID,
-    LONG,
-    STRING_LITERAL,
-    // Identifier
-    IDENTIFIER,
-  };
-
   // AST node types
   enum class ASTNodeType {
     // Operators
@@ -123,43 +71,10 @@ namespace myComp {
     STRING_LITERAL,
   };
 
-  // Data types
-  // enum class DataType {
-  //   NONE,
-  //   INT,
-  //   CHAR,
-  //   VOID,
-  //   LONG,
-  //   INT_PTR,
-  //   CHAR_PTR,
-  //   VOID_PTR,
-  //   LONG_PTR
-  // };
-
-  // struct TypeInfo {
-  //   std::string str;
-  //   int size;
-  //   bool is_integer;
-  //   bool is_pointer;
-  //   std::vector<DataType> convertable_to;
-  //   DataType pointer_form;
-  //   DataType dereference_form;
-  // };
-
   // Context types
   enum class ContextType {
     GLOBAL,
     FUNCTION,
-  };
-
-  // Token struct
-  struct Token {
-    // Token type
-    TokenType type;
-
-    // Can be an integer literal or an identifier
-    int val;
-    std::string string;
   };
 
   // AST struct
@@ -168,7 +83,7 @@ namespace myComp {
     ASTNodeType type;
 
     // contains the value of the integer literal or the identifier
-    int val = 0;
+    long long val = 0;
     std::string string = {};
 
     // Left and right children

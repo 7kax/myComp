@@ -3,8 +3,8 @@
 #include "data.h"
 
 namespace myComp {
-  ASTNode *Tree::int_literal(int value) {
-    Type_ *data_type = nullptr;
+  ASTNode *Tree::int_literal(long long value) {
+    Type_ *data_type;
     if (value >= -128 && value <= 127)
       data_type = TypeFactory::getIntegerType(1, true);
     else if (value >= -32768 && value <= 32767)
@@ -36,7 +36,7 @@ namespace myComp {
     // return new ASTNode(ASTNodeType::VARIABLE_DECLARATION, size,
     //                    std::move(identifier), nullptr, nullptr, data_type);
     return new ASTNode(ASTNodeType::VARIABLE_DECLARATION, 0,
-                       std::move(identifier), nullptr, nullptr, data_type);
+                       identifier, nullptr, nullptr, data_type);
   }
 
   ASTNode *Tree::function_declaration(std::string identifier,

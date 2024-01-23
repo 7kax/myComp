@@ -6,33 +6,44 @@
 
 #include "defs.h"
 
+#include "TokenProcessor.h"
+#include "Expression.h"
+
 namespace myComp {
-class Parser {
-private:
-  // Global variables
-  static void variable_declaration(Type_ *data_type, std::string &name);
+    class Parser {
+    private:
+        TokenProcessor *token_processor_ = nullptr;
 
-  // Local variables
-  static ASTNode *variable_declaration();
+        Expression *expression_ = nullptr;
 
-  static ASTNode *function_declaration(Type_ *return_type,
-                                       const std::string &name);
+        // Global variables
+        void variable_declaration(Type_ *data_type, std::string &name);
 
-  static ASTNode *code_block();
+        // Local variables
+        ASTNode *variable_declaration();
 
-  static ASTNode *statement();
+        ASTNode *function_declaration(Type_ *return_type,
+                                      const std::string &name);
 
-  static ASTNode *if_statement();
+        ASTNode *code_block();
 
-  static ASTNode *while_statement();
+        ASTNode *statement();
 
-  static ASTNode *for_statement();
+        ASTNode *if_statement();
 
-  static ASTNode *return_statement();
+        ASTNode *while_statement();
 
-public:
-  static ASTNode *build_tree();
-};
+        ASTNode *for_statement();
+
+        ASTNode *return_statement();
+
+    public:
+        void set_processor(TokenProcessor *token_processor) { this->token_processor_ = token_processor; }
+
+        void set_expression(Expression *expression) { this->expression_ = expression; }
+
+        ASTNode *build_tree();
+    };
 } // namespace myComp
 
 #endif // MYCOMP_PARSER_H

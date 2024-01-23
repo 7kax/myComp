@@ -3,28 +3,42 @@
 
 #include "defs.h"
 
+#include "TokenProcessor.h"
+
 namespace myComp {
-  class Expression {
-  private:
-    static ASTNode *primary();
+    class Expression {
+    private:
+        TokenProcessor *token_processor_ = nullptr;
 
-    static ASTNode *prefix();
+        ASTNode *primary();
 
-    static ASTNode *identifier();
+        ASTNode *prefix();
 
-    static ASTNode *postfix(const std::string &identifier);
+        ASTNode *identifier();
 
-    static ASTNode *parameters(const std::string &name);
+        ASTNode *postfix(const std::string &identifier);
 
-    // Widen the integer type
-    static void integer_widen(ASTNode *&left, ASTNode *&right);
+        ASTNode *parameters();
 
-    static void integer_scale(ASTNode *&pointer, ASTNode *&integer);
+        // Widen the integer type
+        static void integer_widen(ASTNode *&left, ASTNode *&right);
 
-  public:
-    // Build the AST
-    static ASTNode *build_tree(int pre_precedence);
-  };
+        static void integer_scale(ASTNode *&pointer, ASTNode *&integer);
+
+        static bool is_operator(TokenType type);
+
+        static bool is_prefix_operator(TokenType type);
+
+        static bool is_postfix_operator(TokenType type);
+
+    public:
+        void set_processor(TokenProcessor *token_processor) { this->token_processor_ = token_processor; }
+
+        // Build the AST
+        ASTNode *build_tree(int pre_precedence);
+
+        static constexpr int MAX_PRECEDENCE = 20;
+    };
 } // namespace myComp
 
 #endif // MYCOMP_EXPRESSION_H
