@@ -1,1 +1,1 @@
-Syntax error: expect token comma but got plus on line 1
+expect comma but got plus on line 1

@@ -1,1 +1,1 @@
-void fred() { return(5); }
+void fred() { return (5); }

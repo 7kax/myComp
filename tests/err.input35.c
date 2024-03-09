@@ -1,1 +1,1 @@
-Fatal error: redeclaration of identifier a in scope fred
+Variable a already defined in scope fred

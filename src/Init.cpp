@@ -1,19 +1,15 @@
 #include "defs.h"
-#include "objects.h"
 #include "data.h"
 
-#include "x_86.h"
 #include "Init.h"
-
+#include "X86_CodeGenerator.h"
 
 namespace myComp {
-    void Init::init() {
-        symbol_tables.emplace("global", SymbolTable{});
+void Init::init() {
+    Context_::push("global");
 
-        asm_generator = new x_86();
-    }
+    code_generator = new X86_CodeGenerator();
+}
 
-    void Init::end() {
-        delete asm_generator;
-    }
-} // myComp
+void Init::end() { delete code_generator; }
+} // namespace myComp

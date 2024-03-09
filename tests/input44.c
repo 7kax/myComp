@@ -1,1 +1,4 @@
-int main() { int a; a= z; }
+int main() {
+    int a;
+    a = z;
+}

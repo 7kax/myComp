@@ -8,42 +8,48 @@
 
 #include "TokenProcessor.h"
 #include "Expression.h"
+#include "ASTNode.h"
 
 namespace myComp {
-    class Parser {
-    private:
-        TokenProcessor *token_processor_ = nullptr;
+class Parser {
+  private:
+    TokenProcessor *token_processor_ = nullptr;
 
-        Expression *expression_ = nullptr;
+    Expression expression_;
 
-        // Global variables
-        void variable_declaration(Type_ *data_type, std::string &name);
+    // Global variables
+    VariableDeclarationNode *variable_declaration(Type *data_type,
+                                                  std::string &name);
 
-        // Local variables
-        ASTNode *variable_declaration();
+    // Local variables
+    VariableDeclarationNode *variable_declaration();
 
-        ASTNode *function_declaration(Type_ *return_type,
-                                      const std::string &name);
+    FunctionDefinitionNode *function_declaration(Type *return_type,
+                                                 const std::string &name);
 
-        ASTNode *code_block();
+    CodeBlockNode *code_block();
 
-        ASTNode *statement();
+    StatementNode *statement();
 
-        ASTNode *if_statement();
+    IfNode *if_statement();
 
-        ASTNode *while_statement();
+    WhileNode *while_statement();
 
-        ASTNode *for_statement();
+    ForNode *for_statement();
 
-        ASTNode *return_statement();
+    ReturnNode *return_statement();
 
-    public:
-        void set_processor(TokenProcessor *token_processor) { this->token_processor_ = token_processor; }
+  public:
+    void set_processor(TokenProcessor *token_processor) {
+        this->token_processor_ = token_processor;
+        this->expression_.set_processor(token_processor);
+    }
 
-        void set_expression(Expression *expression) { this->expression_ = expression; }
+    // void set_expression(Expression *expression) { this->expression_ =
+    // expression; }
 
-        ASTNode *build_tree();
-    };
+    ASTNode_ *build_tree();
+};
 } // namespace myComp
 
 #endif // MYCOMP_PARSER_H

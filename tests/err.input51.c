@@ -1,1 +1,1 @@
-Syntax error: Expected single quote at end of char literal on line 2
+expected closing single quote on line 3

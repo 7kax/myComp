@@ -1,1 +1,1 @@
-Syntax error: expected pointer on line 1
+invalid operands to unary *

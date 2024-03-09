@@ -1,1 +1,1 @@
-Syntax error: unexpected token: plus on line 3
+Invalid primary expression on line 3

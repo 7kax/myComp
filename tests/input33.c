@@ -1,3 +1,4 @@
-int main() {
-  char *z; return(z);
+void main() {
+    char *z;
+    return (z);
 }

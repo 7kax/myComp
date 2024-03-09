@@ -5,13 +5,13 @@
 
 namespace myComp {
 
-    class Init {
-    public:
-        static void init();
+class Init {
+  public:
+    static void init();
 
-        static void end();
-    };
+    static void end();
+};
 
-} // myComp
+} // namespace myComp
 
-#endif //MYCOMP_INIT_H
+#endif // MYCOMP_INIT_H

@@ -1,1 +1,1 @@
-Fatal error: return type mismatch in function main
+return type mismatch in function main

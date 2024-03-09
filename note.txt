@@ -128,8 +128,15 @@ context: 函数内部
         left: expression
         right: nullptr
 
-symbol的设计:
-    分为全局和局部
-    全局: 变量名, 数据类型, 数据大小, 数据地址
-    局部: 变量名, 数据类型, 数据大小, 栈内偏移量
-    接口:
+ASTNode继承体系:
+    ASTNode
+        FUNCTION_DEFINITION, CODE_BLOCK
+        StatementNode
+            VARIABLE_DECLARATION, IF, WHILE, FOR, RETURN
+            ExpressionNode
+                BinaryExpressionNode
+                    ADD, SUBTRACT, MULTIPLY, DIVIDE, EQUALS, NEQ, LESS, GREATER, LESS_EQ, GREATER_EQ, OR, LOGICAL_OR, AND, LOGICAL_AND, XOR, L_SHIFT, R_SHIFT, ASSIGN
+                UnaryExpressionNode
+                    ADDRESS, DEREFERENCE, INVERT, NOT, POST_INC, POST_DEC, PRE_INC, PRE_DEC, NEGATIVE
+                LeafNode
+                    VARIABLE, LITERAL, FUNCTION_CALL

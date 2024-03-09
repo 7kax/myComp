@@ -1,3 +1,1 @@
-int main() {
-  pizza cow llama sausage;
-}
+int main() { pizza cow llama sausage; }

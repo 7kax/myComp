@@ -1,6 +1,5 @@
-int fred() {
-    return (20);
-}
+void printint(long n);
+int fred() { return (20); }
 
 int main() {
     int result;

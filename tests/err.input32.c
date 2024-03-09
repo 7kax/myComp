@@ -1,1 +1,1 @@
-Fatal error: undeclared identifier pizza in scope main
+Variable pizza not defined

@@ -1,10 +1,15 @@
+void printint(long n);
 int main() {
-  char  a;
-  char *b;
-  int   d;
-  int  *e;
+    char a;
+    char *b;
+    int d;
+    int *e;
 
-  b= &a; *b= 19; printint(a);
-  e= &d; *e= 12; printint(d);
-  return(0);
+    b = &a;
+    *b = 19;
+    printint(a);
+    e = &d;
+    *e = 12;
+    printint(d);
+    return (0);
 }

@@ -1,1 +1,1 @@
-Syntax error: unrecognized token $ on line 3
+unexpected character $ on line 3

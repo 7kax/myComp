@@ -1,5 +1,5 @@
 int main() {
- char *a;
- char *b;
- a= a + b;
+    char *a;
+    char *b;
+    a = a + b;
 }

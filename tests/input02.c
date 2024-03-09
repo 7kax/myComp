@@ -1,3 +1,5 @@
+void printint(long n);
+
 int main() {
     int fred;
     int jim;

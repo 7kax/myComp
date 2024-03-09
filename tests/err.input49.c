@@ -1,1 +1,1 @@
-Fatal error: function main has no return statement
+function main must return a value

@@ -1,1 +1,1 @@
-Fatal error: undeclared identifier b in scope main
+Variable b not defined

@@ -1,3 +1,4 @@
 int main() {
-  char a; a= 'fred';
+    char a;
+    a = 'fred';
 }

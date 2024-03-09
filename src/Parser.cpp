@@ -1,272 +1,294 @@
 #include "Parser.h"
-
-#include "SymbolTable.h"
 #include "Context.h"
-#include "Tree.h"
-#include "Errors.h"
 
 #include "data.h"
 
 namespace myComp {
-    ASTNode *Parser::build_tree() {
-        Type_ *data_type = this->token_processor_->next_data_type();
-        std::string identifier = this->token_processor_->next_identifier();
+ASTNode_ *Parser::build_tree() {
+    Type *data_type = token_processor_->next_data_type();
+    std::string identifier = token_processor_->next_identifier();
 
-        if (this->token_processor_->peek_token().first->type() != TokenType::LPAREN) {
-            variable_declaration(data_type, identifier);
-            // scanner.semi();
-            // this->token_processor_->semi();
-            return nullptr;
-        } else
-            return function_declaration(data_type, identifier);
+    if (token_processor_->peek_type() != TokenType::LPAREN) {
+        return variable_declaration(data_type, identifier);
+    } else
+        return function_declaration(data_type, identifier);
+}
+
+// todo: optimize this function
+VariableDeclarationNode *Parser::variable_declaration(Type *data_type,
+                                                      std::string &name) {
+    if (token_processor_->peek_type() == TokenType::LBRACKET) {
+
+        token_processor_->lbracket();
+        int size = static_cast<int>(token_processor_->next_integer());
+        token_processor_->rbracket();
+
+        Type *array_type = TypeFactory::get_array(data_type, size);
+        VariableManager::insert(array_type, name, Context_::get_name());
+    } else {
+        VariableManager::insert(data_type, name, Context_::get_name());
     }
+    while (token_processor_->peek_type() == TokenType::COMMA) {
+        token_processor_->comma();
 
-    // todo: optimize this function
-    void Parser::variable_declaration(Type_ *data_type, std::string &name) {
-        // int size = 1;
-        // Type_ *array_type = nullptr;
-        SymbolTable &table = symbol_tables[context.get_name()];
+        name = token_processor_->next_identifier();
 
-        // auto [token, line] = this->token_processor_->peek_token();
-        if (this->token_processor_->peek_token().first->type() == TokenType::LBRACKET) {
-            this->token_processor_->lbracket();
-            int size = static_cast<int>(this->token_processor_->next_integer());
-            this->token_processor_->rbracket();
-            Type_ *array_type = TypeFactory::getArrayType(data_type, size);
-            table.insert(name, array_type);
+        if (token_processor_->peek_type() == TokenType::LBRACKET) {
+
+            token_processor_->lbracket();
+            int size = static_cast<int>(token_processor_->next_integer());
+            token_processor_->rbracket();
+
+            Type *array_type = TypeFactory::get_array(data_type, size);
+            VariableManager::insert(array_type, name, Context_::get_name());
         } else {
-            table.insert(name, data_type);
+            VariableManager::insert(data_type, name, Context_::get_name());
         }
-
-        // std::tie(token, line) = this->token_processor_->peek_token();
-        while (this->token_processor_->peek_token().first->type() == TokenType::COMMA) {
-            this->token_processor_->comma();
-            name = this->token_processor_->next_identifier();
-            // std::tie(token, line) = this->token_processor_->peek_token();
-            if (this->token_processor_->peek_token().first->type() == TokenType::LBRACKET) {
-                this->token_processor_->lbracket();
-                int size = static_cast<int>(this->token_processor_->next_integer());
-                this->token_processor_->rbracket();
-                Type_ *array_type = TypeFactory::getArrayType(data_type, size);
-                table.insert(name, array_type);
-            } else {
-                table.insert(name, data_type);
-            }
-        }
-        this->token_processor_->semi();
     }
+    token_processor_->semi();
 
-    ASTNode *Parser::variable_declaration() {
-        Type_ *data_type = this->token_processor_->next_data_type();
-        SymbolTable &table = symbol_tables[context.get_name()];
-        // Build the tree
-        ASTNode *root = nullptr, *current = nullptr;
-        // auto [token, line] = this->token_processor_->peek_token();
-        while (this->token_processor_->peek_token().first->type() != TokenType::SEMI) {
-            std::string name = this->token_processor_->next_identifier();
-            // std::tie(token, line) = this->token_processor_->peek_token();
-            if (this->token_processor_->peek_token().first->type() == TokenType::LBRACKET) {
-                this->token_processor_->lbracket();
-                int size = static_cast<int>(this->token_processor_->next_integer());
-                this->token_processor_->rbracket();
-                Type_ *array_type = TypeFactory::getArrayType(data_type, size);
-                table.insert(name, array_type);
-            } else {
-                // symbol_tables[function_name].insert(name, data_type, size);
-                table.insert(name, data_type);
-            }
-            if (root == nullptr)
-                root = current = Tree::variable_declaration(name, data_type);
-            else {
-                current->left = Tree::variable_declaration(name, data_type);
-                current = current->left;
-            }
-            // std::tie(token, line) = this->token_processor_->peek_token();
-            if (this->token_processor_->peek_token().first->type() != TokenType::SEMI)
-                this->token_processor_->comma();
-        }
+    // Do not support initialization on declaration
 
-        return root;
-    }
+    return new VariableDeclarationNode(nullptr, nullptr);
+}
 
-    ASTNode *Parser::function_declaration(Type_ *return_type,
-                                          const std::string &name) {
-        // Tell if the function is already declared
-        bool declared = function.is_declared(name);
-        if (declared)
-            assert(return_type == function.get_prototype(name).return_type);
-        // Fetch the parameter list
-        this->token_processor_->lparen();
-        if (declared) {
-            // Update the parameter list
-            for (auto &parameters = function.get_prototype(name).parameters;
-                    auto &[type, param_name]: parameters) {
-                // assert(scanner.next_data_type() == parameter.type);
-                if (this->token_processor_->next_data_type() != type) {
-                    Errors::fatal_error("type doesn't match prototype for parameter: " +
-                                        param_name + " in function " + name);
-                }
-                // auto [token, line] = this->token_processor_->peek_token();
-                if (this->token_processor_->peek_token().first->type() == TokenType::IDENTIFIER) {
-                    param_name = this->token_processor_->next_identifier();
-                    // std::tie(token, line) = this->token_processor_->peek_token();
-                }
-                if (this->token_processor_->peek_token().first->type() != TokenType::RPAREN)
-                    this->token_processor_->comma();
-            }
+VariableDeclarationNode *Parser::variable_declaration() {
+    Type *data_type = token_processor_->next_data_type();
+
+    // Build the tree
+    while (token_processor_->peek_type() != TokenType::SEMI) {
+        std::string name = token_processor_->next_identifier();
+        if (token_processor_->peek_type() == TokenType::LBRACKET) {
+            token_processor_->lbracket();
+            int size = static_cast<int>(token_processor_->next_integer());
+            token_processor_->rbracket();
+
+            Type *array_type = TypeFactory::get_array(data_type, size);
+            VariableManager::insert(array_type, name, Context_::get_name());
         } else {
-            // Build the parameter list
-            std::vector<parameter> parameters;
-            // auto [token, line] = this->token_processor_->peek_token();
-            while (this->token_processor_->peek_token().first->type() != TokenType::RPAREN) {
-                Type_ *data_type = this->token_processor_->next_data_type();
-                std::string identifier;
-                // std::tie(token, line) = this->token_processor_->peek_token();
-                if (this->token_processor_->peek_token().first->type() == TokenType::IDENTIFIER)
-                    identifier = this->token_processor_->next_identifier();
-                parameters.emplace_back(data_type, identifier);
-                // std::tie(token, line) = this->token_processor_->peek_token();
-                if (this->token_processor_->peek_token().first->type() != TokenType::RPAREN)
-                    this->token_processor_->comma();
+            VariableManager::insert(data_type, name, Context_::get_name());
+        }
+        if (token_processor_->peek_type() != TokenType::SEMI)
+            token_processor_->comma();
+    }
+
+    // Do not support initialization on declaration
+
+    return new VariableDeclarationNode(nullptr, nullptr);
+}
+
+FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
+                                                     const std::string &name) {
+    // Set the context
+    Context_::push(name);
+
+    // Tell if the function is already declared
+    bool declared = FunctionManager::exists(name);
+    FunctionPrototype_ *prototype = FunctionManager::find(name);
+
+    // If the function is already declared, check if the return type matches
+    if (declared && return_type != prototype->return_type_) {
+        throw std::runtime_error("return type mismatch in function " + name);
+    }
+
+    // Fetch the parameter list
+    token_processor_->lparen();
+
+    // If the function is already declared, check if the parameter list matches
+    // Fill in the name of the parameters
+    if (declared) {
+        // Update the parameter list
+        for (auto &parameters = prototype->parameters_;
+             auto &parameter : parameters) {
+            Type *type = parameter->type;
+
+            // Check if the parameter type matches
+            if (token_processor_->next_data_type() != type) {
+                throw std::runtime_error(
+                    "parameter type mismatch in function " + name);
             }
-            function.add_prototype(name, return_type, parameters);
-        }
-        this->token_processor_->rparen();
-        // If next token is a semicolon, it's a declaration
-        if (this->token_processor_->peek_token().first->type() == TokenType::SEMI) {
-            this->token_processor_->semi();
-            return nullptr;
-        }
 
-        // Otherwise, it's a definition
-        // Import the parameter list to the symbol table
-        for (const auto &parameters = function.get_prototype(name).parameters;
-                const auto &[type, param_name]: parameters) {
-            assert(!param_name.empty());
-            symbol_tables[name].insert(param_name, type);
-        }
-
-        // Build the tree
-        context.push(name);
-        ASTNode *tree = code_block();
-
-        // Ensure non-void functions have a return statement
-        if (!return_type->is_void() && !context.has_return()) {
-            Errors::fatal_error("function " + name + " has no return statement");
-        }
-
-        // Ensure void functions don't have a return statement
-        if (return_type->is_void() && context.has_return()) {
-            Errors::fatal_error("can't return a value from a void function " + name);
-        }
-
-        context.pop();
-
-        return Tree::function_declaration(name, tree);
-    }
-
-    ASTNode *Parser::code_block() {
-        this->token_processor_->lbrace();
-        ASTNode *root = nullptr, *n = nullptr;
-        while (this->token_processor_->peek_token().first->type() != TokenType::RBRACE) {
-            if (root == nullptr)
-                root = n = Tree::unary(ASTNodeType::COMPOUND, Parser::statement());
-            else {
-                n->right = Tree::unary(ASTNodeType::COMPOUND, Parser::statement());
-                n = n->right;
+            // If the parameter has a name, fill it in
+            if (token_processor_->peek_type() == TokenType::IDENTIFIER) {
+                parameter->name = token_processor_->next_identifier();
             }
+
+            if (token_processor_->peek_type() != TokenType::RPAREN)
+                token_processor_->comma();
         }
-        this->token_processor_->rbrace();
+    } else {
 
-        return root;
-    }
+        // If the function is not declared, build the parameter list
+        std::vector<Variable *> parameters;
+        while (token_processor_->peek_type() != TokenType::RPAREN) {
 
-    ASTNode *Parser::statement() {
-        switch (this->token_processor_->peek_token().first->type()) {
-            case TokenType::IF:
-                return Parser::if_statement();
-            case TokenType::WHILE:
-                return Parser::while_statement();
-            case TokenType::FOR:
-                return Parser::for_statement();
-            case TokenType::RETURN:
-                return Parser::return_statement();
-            default:
-                ASTNode *node;
-                if (data_types.contains(this->token_processor_->peek_token().first->type()))
-                    node = Parser::variable_declaration();
-                else
-                    node = this->expression_->build_tree(Expression::MAX_PRECEDENCE);
-                this->token_processor_->semi();
-                return node;
+            // Get data type and identifier
+            Type *data_type = token_processor_->next_data_type();
+            std::string identifier;
+            if (token_processor_->peek_type() == TokenType::IDENTIFIER)
+                identifier = token_processor_->next_identifier();
+
+            // Insert the parameter into the parameter list
+            VariableManager::insert(data_type, identifier,
+                                    Context_::get_name());
+            Variable *parameter = VariableManager::find(identifier);
+            parameters.push_back(parameter);
+
+            if (token_processor_->peek_type() != TokenType::RPAREN)
+                token_processor_->comma();
         }
+
+        // Insert the function prototype into the symbol table
+        FunctionManager::insert(return_type, name, parameters);
+
+        // Update the prototype
+        prototype = FunctionManager::find(name);
+    }
+    token_processor_->rparen();
+
+    // If next token is a semicolon, it's a declaration
+    if (token_processor_->peek_type() == TokenType::SEMI) {
+        token_processor_->semi();
+        Context_::pop();
+        return nullptr;
     }
 
-    ASTNode *Parser::if_statement() {
-        this->token_processor_->match(TokenType::IF);
-
-        this->token_processor_->lparen();
-        ASTNode *condition = this->expression_->build_tree(Expression::MAX_PRECEDENCE);
-        this->token_processor_->rparen();
-
-        ASTNode *block_if = code_block();
-
-        if (this->token_processor_->peek_token().first->type() != TokenType::ELSE)
-            return Tree::join(ASTNodeType::IF, condition, block_if);
-
-        this->token_processor_->match(TokenType::ELSE);
-
-        ASTNode *block_else = Parser::code_block();
-
-        return Tree::join(ASTNodeType::IF, condition,
-                          Tree::join(ASTNodeType::ELSE, block_if, block_else));
+    // Otherwise, it's a definition
+    // Make sure the parameters have names
+    for (const auto &parameters = prototype->parameters_;
+         auto param : parameters) {
+        assert(!param->name.empty());
     }
 
-    ASTNode *Parser::while_statement() {
-        this->token_processor_->match(TokenType::WHILE);
+    // Build the code block
+    CodeBlockNode *block = code_block();
 
-        this->token_processor_->lparen();
-        ASTNode *condition = this->expression_->build_tree(Expression::MAX_PRECEDENCE);
-        this->token_processor_->rparen();
-
-        ASTNode *block = code_block();
-
-        return Tree::join(ASTNodeType::WHILE, condition, block);
+    // Ensure non-void functions have a return statement
+    if (!return_type->is_void() && !Context_::has_return()) {
+        throw std::runtime_error("function " + name + " must return a value");
     }
 
-    ASTNode *Parser::for_statement() {
-        this->token_processor_->match(TokenType::FOR);
-
-        this->token_processor_->lparen();
-        ASTNode *init = this->expression_->build_tree(Expression::MAX_PRECEDENCE);
-        this->token_processor_->semi();
-        ASTNode *condition = this->expression_->build_tree(Expression::MAX_PRECEDENCE);
-        this->token_processor_->semi();
-        ASTNode *increment = this->expression_->build_tree(Expression::MAX_PRECEDENCE);
-        this->token_processor_->rparen();
-
-        ASTNode *block = code_block();
-
-        return Tree::join(ASTNodeType::FOR,
-                          Tree::join(ASTNodeType::GLUE, init, condition),
-                          Tree::join(ASTNodeType::GLUE, increment, block));
+    // Ensure void functions don't have a return statement
+    if (return_type->is_void() && Context_::has_return()) {
+        throw std::runtime_error("void function " + name +
+                                 " cannot return a "
+                                 "value");
     }
 
-    ASTNode *Parser::return_statement() {
-        this->token_processor_->match(TokenType::RETURN);
+    // Pop the context
+    Context_::pop();
 
-        ASTNode *node = this->expression_->build_tree(Expression::MAX_PRECEDENCE);
+    // Build the function definition node
+    return new FunctionDefinitionNode(prototype, block);
+}
 
-        this->token_processor_->semi();
+CodeBlockNode *Parser::code_block() {
+    token_processor_->lbrace();
 
-        if (!node->data_type->convertable_to(
-                function.get_prototype(context.get_name()).return_type))
-            Errors::fatal_error("return type mismatch in function " +
-                                context.get_name());
-
-        // Set the return flag
-        context.set_return_flag();
-
-        return Tree::unary(ASTNodeType::RETURN, node);
+    std::vector<StatementNode *> statements;
+    while (token_processor_->peek_type() != TokenType::RBRACE) {
+        statements.push_back(statement());
     }
+    token_processor_->rbrace();
+
+    return new CodeBlockNode(statements);
+}
+
+StatementNode *Parser::statement() {
+    switch (token_processor_->peek_type()) {
+    case TokenType::IF:
+        return Parser::if_statement();
+    case TokenType::WHILE:
+        return Parser::while_statement();
+    case TokenType::FOR:
+        return Parser::for_statement();
+    case TokenType::RETURN:
+        return Parser::return_statement();
+    default:
+        StatementNode *node = nullptr;
+        if (data_types.contains(token_processor_->peek_type()))
+            node = Parser::variable_declaration();
+        else
+            node = expression_.build_tree(Expression::MAX_PRECEDENCE);
+        token_processor_->semi();
+        return node;
+    }
+}
+
+IfNode *Parser::if_statement() {
+    token_processor_->match(TokenType::IF);
+
+    // Parse the condition
+    token_processor_->lparen();
+    ExpressionNode *condition =
+        expression_.build_tree(Expression::MAX_PRECEDENCE);
+    token_processor_->rparen();
+
+    // Parse the code block
+    CodeBlockNode *block_if = code_block();
+
+    // If there is an else statement, parse it
+    CodeBlockNode *block_else = nullptr;
+    if (token_processor_->peek_type() == TokenType::ELSE) {
+        token_processor_->match(TokenType::ELSE);
+        block_else = Parser::code_block();
+    }
+
+    return new IfNode(condition, block_if, block_else);
+}
+
+WhileNode *Parser::while_statement() {
+    token_processor_->match(TokenType::WHILE);
+
+    token_processor_->lparen();
+
+    ExpressionNode *condition =
+        expression_.build_tree(Expression::MAX_PRECEDENCE);
+
+    token_processor_->rparen();
+
+    CodeBlockNode *block = code_block();
+
+    return new WhileNode(condition, block);
+}
+
+ForNode *Parser::for_statement() {
+    token_processor_->match(TokenType::FOR);
+
+    token_processor_->lparen();
+
+    ExpressionNode *init = expression_.build_tree(Expression::MAX_PRECEDENCE);
+    token_processor_->semi();
+    ExpressionNode *condition =
+        expression_.build_tree(Expression::MAX_PRECEDENCE);
+    token_processor_->semi();
+    ExpressionNode *increment =
+        expression_.build_tree(Expression::MAX_PRECEDENCE);
+
+    token_processor_->rparen();
+
+    CodeBlockNode *block = code_block();
+
+    return new ForNode(init, condition, increment, block);
+}
+
+ReturnNode *Parser::return_statement() {
+    token_processor_->match(TokenType::RETURN);
+
+    ExpressionNode *node = expression_.build_tree(Expression::MAX_PRECEDENCE);
+
+    token_processor_->semi();
+
+    // Check if the return type matches the function prototype
+    if (!convertable_to(
+            node->type(),
+            FunctionManager::find(Context_::get_name())->return_type_))
+        throw std::runtime_error("return type mismatch in function " +
+                                 Context_::get_name());
+
+    // Set the return flag
+    Context_::set_return_flag();
+
+    return new ReturnNode(node);
+}
 } // namespace myComp

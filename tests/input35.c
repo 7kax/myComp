@@ -1,4 +1,4 @@
 int fred(int a, int b) {
-  int a;
-  return(a);
+    int a;
+    return (a);
 }

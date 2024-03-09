@@ -19,15 +19,17 @@
 
 #include "Type.h"
 #include "Token.h"
+#include "ASTNode.h"
 
 namespace myComp {
-  // AST node types
-  enum class ASTNodeType {
+// AST node types
+enum class ASTNodeType {
     // Operators
     ADD,
     SUBTRACT,
     MULTIPLY,
     DIVIDE,
+    MODULO,
     EQUALS,
     NEQ,
     LESS,
@@ -50,6 +52,7 @@ namespace myComp {
     PRE_INC,
     PRE_DEC,
     NEGATIVE,
+    POSITIVE,
     // Statements
     ASSIGN,
     VARIABLE_DECLARATION,
@@ -69,16 +72,16 @@ namespace myComp {
     FUNCTION_CALL,
     SCALE,
     STRING_LITERAL,
-  };
+};
 
-  // Context types
-  enum class ContextType {
+// Context types
+enum class ContextType {
     GLOBAL,
     FUNCTION,
-  };
+};
 
-  // AST struct
-  struct ASTNode {
+// AST struct
+struct ASTNode {
     // AST node type, deciding the operation
     ASTNodeType type;
 
@@ -91,41 +94,41 @@ namespace myComp {
     ASTNode *right = nullptr;
 
     // DataType: only valid for expression nodes
-    Type_ *data_type = nullptr;
+    Type *data_type = nullptr;
 
     // Destructor
     ~ASTNode() {
-      delete left;
-      delete right;
+        delete left;
+        delete right;
     }
-  };
+};
 
-  // Function prototype parameter struct
-  struct parameter {
-    Type_ *type;
+// Function prototype parameter struct
+struct parameter {
+    Type *type;
     std::string name;
-  };
+};
 
-  // Function prototype struct
-  struct FunctionPrototype {
-    Type_ *return_type;
+// Function prototype struct
+struct FunctionPrototype {
+    Type *return_type;
     std::vector<parameter> parameters;
-  };
+};
 
-  // Context node struct
-  struct ContextNode {
+// Context node struct
+struct ContextNode {
     ContextType type;
     std::string name;
     std::string end_label;
     bool has_return = false;
-  };
+};
 
-  // Symbol struct
-  struct Symbol {
+// Symbol struct
+struct Symbol {
     // DataType data_type = DataType::NONE;
-    Type_ *type = nullptr;
+    Type *type = nullptr;
     int offset = 0;
-  };
+};
 } // namespace myComp
 
 #endif // MYCOMP_DEFS_H
