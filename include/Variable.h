@@ -1,0 +1,4 @@
+#ifndef MYCOMP_VARIABLE_H
+#define MYCOMP_VARIABLE_H
+
+#endif //MYCOMP_VARIABLE_H
