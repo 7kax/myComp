@@ -907,7 +907,7 @@ FunctionCallNode::FunctionCallNode(const std::string &name,
 
 std::optional<int>
 FunctionCallNode::generate_code(CodeGenerator *code_generator) const {
-    FunctionPrototype_ *prototype = FunctionManager::find(name_);
+    FunctionPrototype *prototype = FunctionManager::find(name_);
 
     for (int i = arguments_.size(); i >= 1; i--) {
         // Calculate the i'th argument

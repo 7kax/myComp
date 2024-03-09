@@ -1,10 +1,7 @@
 #ifndef MYCOMP_INIT_H
 #define MYCOMP_INIT_H
 
-#include "defs.h"
-
 namespace myComp {
-
 class Init {
   public:
     static void init();

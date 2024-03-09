@@ -4,8 +4,6 @@
 // This is the header file for the parser.
 // The parser is responsible for parsing the input
 
-#include "defs.h"
-
 #include "TokenProcessor.h"
 #include "Expression.h"
 #include "ASTNode.h"

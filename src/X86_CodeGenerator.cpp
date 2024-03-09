@@ -809,7 +809,7 @@ int X86_CodeGenerator::call_function(std::string_view name) {
     output_file_ << "\tcall\t" << name << "\n";
 
     // Remove the arguments in the stack
-    FunctionPrototype_ *func = FunctionManager::find(name.data());
+    FunctionPrototype *func = FunctionManager::find(name.data());
     if (func->parameters_.size() > 6) {
         output_file_ << "\taddq\t$" << 8 * (func->parameters_.size() - 6)
                      << ", %rsp\n";

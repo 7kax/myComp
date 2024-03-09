@@ -5,36 +5,14 @@
 #include <stack>
 
 #include "Variable.h"
-// #include "Errors.h"
 
 namespace myComp {
-// OLD VERSION
-// class Context {
-//   private:
-//     std::stack<ContextNode> context_stack;
-
-//   public:
-//     Context();
-
-//     void push(const std::string &name);
-//     void push(const std::string &name, const std::string &end_label);
-//     void pop();
-
-//     [[nodiscard]] ContextType get_type() const;
-//     [[nodiscard]] const std::string &get_name() const;
-//     [[nodiscard]] const std::string &get_end_label() const;
-//     [[nodiscard]] bool is_global() const;
-//     void set_return_flag();
-//     [[nodiscard]] bool has_return() const;
-// };
-
-// NEW VERSION
-struct ContextNode_ {
+struct ContextNode {
     std::string name_;
     bool has_return_ = false;
 };
 
-class Context_ {
+class Context {
   public:
     static std::string &get_name() { return get_stack().top().name_; }
     static void push(const std::string &name) { get_stack().push({name}); }
@@ -43,13 +21,13 @@ class Context_ {
     static void set_return_flag() { get_stack().top().has_return_ = true; }
 
   private:
-    static std::stack<ContextNode_> &get_stack() {
-        static std::stack<ContextNode_> stack;
+    static std::stack<ContextNode> &get_stack() {
+        static std::stack<ContextNode> stack;
         return stack;
     }
 };
 
-struct FunctionPrototype_ {
+struct FunctionPrototype {
     Type *return_type_ = nullptr;
     std::string name_;
     std::vector<Variable *> parameters_;
@@ -82,7 +60,7 @@ class FunctionManager {
         }
     }
 
-    static FunctionPrototype_ *find(const std::string &name) {
+    static FunctionPrototype *find(const std::string &name) {
         auto &cache = getCache();
         auto it = cache.find(name);
         if (it == cache.end()) {
@@ -98,7 +76,7 @@ class FunctionManager {
         if (it != cache.end()) {
             throw std::runtime_error("function " + name + " already defined");
         }
-        auto func = std::make_unique<FunctionPrototype_>();
+        auto func = std::make_unique<FunctionPrototype>();
         func->return_type_ = return_type;
         func->name_ = name;
         func->parameters_ = std::move(parameters);
@@ -106,11 +84,10 @@ class FunctionManager {
     }
 
   private:
-    static std::unordered_map<std::string,
-                              std::unique_ptr<FunctionPrototype_>> &
+    static std::unordered_map<std::string, std::unique_ptr<FunctionPrototype>> &
     getCache() {
         static std::unordered_map<std::string,
-                                  std::unique_ptr<FunctionPrototype_>>
+                                  std::unique_ptr<FunctionPrototype>>
             cache;
         return cache;
     }

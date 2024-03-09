@@ -6,7 +6,7 @@ Variable *VariableManager::find(const std::string &name) {
     auto &cache = getCache();
 
     // Search for the variable in current scope
-    auto it = cache.find(Context_::get_name() + "_" + name);
+    auto it = cache.find(Context::get_name() + "_" + name);
     if (it != cache.end()) {
         return it->second.get();
     }

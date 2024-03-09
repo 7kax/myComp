@@ -1,12 +1,10 @@
-#include "defs.h"
-#include "data.h"
-
 #include "Init.h"
+#include "data.h"
 #include "X86_CodeGenerator.h"
 
 namespace myComp {
 void Init::init() {
-    Context_::push("global");
+    Context::push("global");
 
     code_generator = new X86_CodeGenerator();
 }

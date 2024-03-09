@@ -1,4 +1,3 @@
-#include "defs.h"
 #include "data.h"
 
 namespace myComp {

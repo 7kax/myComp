@@ -2,6 +2,7 @@
 #define TOKENPROCESSOR_H
 
 #include "Scanner.h"
+#include "Type.h"
 
 namespace myComp {
 class TokenProcessor {

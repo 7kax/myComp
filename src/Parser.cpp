@@ -1,6 +1,5 @@
 #include "Parser.h"
 #include "Context.h"
-
 #include "data.h"
 
 namespace myComp {
@@ -24,9 +23,9 @@ VariableDeclarationNode *Parser::variable_declaration(Type *data_type,
         token_processor_->rbracket();
 
         Type *array_type = TypeFactory::get_array(data_type, size);
-        VariableManager::insert(array_type, name, Context_::get_name());
+        VariableManager::insert(array_type, name, Context::get_name());
     } else {
-        VariableManager::insert(data_type, name, Context_::get_name());
+        VariableManager::insert(data_type, name, Context::get_name());
     }
     while (token_processor_->peek_type() == TokenType::COMMA) {
         token_processor_->comma();
@@ -40,9 +39,9 @@ VariableDeclarationNode *Parser::variable_declaration(Type *data_type,
             token_processor_->rbracket();
 
             Type *array_type = TypeFactory::get_array(data_type, size);
-            VariableManager::insert(array_type, name, Context_::get_name());
+            VariableManager::insert(array_type, name, Context::get_name());
         } else {
-            VariableManager::insert(data_type, name, Context_::get_name());
+            VariableManager::insert(data_type, name, Context::get_name());
         }
     }
     token_processor_->semi();
@@ -64,9 +63,9 @@ VariableDeclarationNode *Parser::variable_declaration() {
             token_processor_->rbracket();
 
             Type *array_type = TypeFactory::get_array(data_type, size);
-            VariableManager::insert(array_type, name, Context_::get_name());
+            VariableManager::insert(array_type, name, Context::get_name());
         } else {
-            VariableManager::insert(data_type, name, Context_::get_name());
+            VariableManager::insert(data_type, name, Context::get_name());
         }
         if (token_processor_->peek_type() != TokenType::SEMI)
             token_processor_->comma();
@@ -80,11 +79,11 @@ VariableDeclarationNode *Parser::variable_declaration() {
 FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
                                                      const std::string &name) {
     // Set the context
-    Context_::push(name);
+    Context::push(name);
 
     // Tell if the function is already declared
     bool declared = FunctionManager::exists(name);
-    FunctionPrototype_ *prototype = FunctionManager::find(name);
+    FunctionPrototype *prototype = FunctionManager::find(name);
 
     // If the function is already declared, check if the return type matches
     if (declared && return_type != prototype->return_type_) {
@@ -129,8 +128,7 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
                 identifier = token_processor_->next_identifier();
 
             // Insert the parameter into the parameter list
-            VariableManager::insert(data_type, identifier,
-                                    Context_::get_name());
+            VariableManager::insert(data_type, identifier, Context::get_name());
             Variable *parameter = VariableManager::find(identifier);
             parameters.push_back(parameter);
 
@@ -149,7 +147,7 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
     // If next token is a semicolon, it's a declaration
     if (token_processor_->peek_type() == TokenType::SEMI) {
         token_processor_->semi();
-        Context_::pop();
+        Context::pop();
         return nullptr;
     }
 
@@ -157,26 +155,28 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
     // Make sure the parameters have names
     for (const auto &parameters = prototype->parameters_;
          auto param : parameters) {
-        assert(!param->name.empty());
+        if (param->name.empty())
+            throw std::runtime_error("parameter " + param->name +
+                                     " has no name");
     }
 
     // Build the code block
     CodeBlockNode *block = code_block();
 
     // Ensure non-void functions have a return statement
-    if (!return_type->is_void() && !Context_::has_return()) {
+    if (!return_type->is_void() && !Context::has_return()) {
         throw std::runtime_error("function " + name + " must return a value");
     }
 
     // Ensure void functions don't have a return statement
-    if (return_type->is_void() && Context_::has_return()) {
+    if (return_type->is_void() && Context::has_return()) {
         throw std::runtime_error("void function " + name +
                                  " cannot return a "
                                  "value");
     }
 
     // Pop the context
-    Context_::pop();
+    Context::pop();
 
     // Build the function definition node
     return new FunctionDefinitionNode(prototype, block);
@@ -282,12 +282,12 @@ ReturnNode *Parser::return_statement() {
     // Check if the return type matches the function prototype
     if (!convertable_to(
             node->type(),
-            FunctionManager::find(Context_::get_name())->return_type_))
+            FunctionManager::find(Context::get_name())->return_type_))
         throw std::runtime_error("return type mismatch in function " +
-                                 Context_::get_name());
+                                 Context::get_name());
 
     // Set the return flag
-    Context_::set_return_flag();
+    Context::set_return_flag();
 
     return new ReturnNode(node);
 }

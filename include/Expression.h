@@ -1,9 +1,8 @@
 #ifndef MYCOMP_EXPRESSION_H
 #define MYCOMP_EXPRESSION_H
 
-#include "defs.h"
-
 #include "TokenProcessor.h"
+#include "ASTNode.h"
 
 namespace myComp {
 class Expression {

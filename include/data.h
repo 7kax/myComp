@@ -1,9 +1,11 @@
 #ifndef MYCOMP_DATA_H
 #define MYCOMP_DATA_H
 
-#include "defs.h"
+#include <map>
+#include <set>
 
-#include "Context.h"
+#include "Token.h"
+#include "ASTNode.h"
 
 namespace myComp {
 // Debug flag
@@ -24,23 +26,8 @@ extern const std::map<ASTNodeType, const char *> ASTNode_str;
 // String literals
 extern std::map<std::string, std::string> string_literals;
 
-// Symbol tables
-// extern std::map<std::string, SymbolTable> symbol_tables;
-
-// Scanner
-// extern Scanner scanner;
-
-// Generate code
-// extern Generator generator;
-
 // Assembly code generator
 extern CodeGenerator *code_generator;
-
-// Function
-// extern Function function;
-
-// Context
-// extern Context context;
 } // namespace myComp
 
 #endif // MYCOMP_DATA_H

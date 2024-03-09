@@ -8,6 +8,57 @@
 #include "Context.h"
 
 namespace myComp {
+enum class ASTNodeType {
+    // Operators
+    ADD,
+    SUBTRACT,
+    MULTIPLY,
+    DIVIDE,
+    MODULO,
+    EQUALS,
+    NEQ,
+    LESS,
+    GREATER,
+    LESS_EQ,
+    GREATER_EQ,
+    ADDRESS,
+    DEREFERENCE,
+    OR,
+    LOGICAL_OR,
+    AND,
+    LOGICAL_AND,
+    XOR,
+    L_SHIFT,
+    R_SHIFT,
+    INVERT,
+    NOT,
+    POST_INC,
+    POST_DEC,
+    PRE_INC,
+    PRE_DEC,
+    NEGATIVE,
+    POSITIVE,
+    // Statements
+    ASSIGN,
+    VARIABLE_DECLARATION,
+    // Control flow
+    COMPOUND,
+    IF,
+    ELSE,
+    WHILE,
+    FOR,
+    GLUE,
+    RETURN,
+    // Functions
+    FUNCTION_DECLARATION,
+    VARIABLE,
+    WIDEN,
+    INT_LITERAL,
+    FUNCTION_CALL,
+    SCALE,
+    STRING_LITERAL,
+};
+
 // Base class for all AST nodes
 class ASTNode_ {
   public:
@@ -78,7 +129,7 @@ class FunctionDefinitionNode : public ASTNode_ {
   public:
     ~FunctionDefinitionNode() override { delete code_block_; }
 
-    FunctionDefinitionNode(FunctionPrototype_ *prototype,
+    FunctionDefinitionNode(FunctionPrototype *prototype,
                            CodeBlockNode *code_block)
         : prototype_(prototype), code_block_(code_block) {}
 
@@ -95,7 +146,7 @@ class FunctionDefinitionNode : public ASTNode_ {
     void print(std::ostream &os, int indent) const override;
 
   private:
-    FunctionPrototype_ *prototype_ = nullptr;
+    FunctionPrototype *prototype_ = nullptr;
     CodeBlockNode *code_block_ = nullptr;
 };
 

@@ -1,9 +1,10 @@
 #ifndef MYCOMP_SCANNER_H
 #define MYCOMP_SCANNER_H
 
-// This is the header file for the scanner
+#include <fstream>
+#include <map>
 
-#include "defs.h"
+#include "Token.h"
 
 namespace myComp {
 class Scanner {
