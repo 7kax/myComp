@@ -48,9 +48,7 @@ def compile_and_run_test(test_file):
 def main():
     # 找到所有的测试文件
     test_files = [
-        filename
-        for filename in os.listdir("codes")
-        if filename.startswith("input") and filename.endswith(".c")
+        filename for filename in os.listdir("codes") if filename.endswith(".c")
     ]
 
     for test_file in test_files:

@@ -123,9 +123,7 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
 
             // Get data type and identifier
             Type *data_type = token_processor_->next_data_type();
-            std::string identifier;
-            if (token_processor_->peek_type() == TokenType::IDENTIFIER)
-                identifier = token_processor_->next_identifier();
+            std::string identifier = token_processor_->next_identifier();
 
             // Insert the parameter into the parameter list
             VariableManager::insert(data_type, identifier, Context::get_name());

@@ -1,9 +1,0 @@
-void printint(long n);
-int main() {
-    int i;
-    for (i = 1; i <= 10; i = i + 1) {
-        printint(i);
-    }
-
-    return 0;
-}
