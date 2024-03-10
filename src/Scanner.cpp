@@ -39,6 +39,9 @@ void Scanner::next() {
     case '/':
         this->token = TokenFactory::getToken(TokenType::SLASH);
         return;
+    case '%':
+        this->token = TokenFactory::getToken(TokenType::MOD);
+        return;
     case '^':
         this->token = TokenFactory::getToken(TokenType::XOR);
         return;

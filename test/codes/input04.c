@@ -1,5 +1,5 @@
 void printint(long n);
-void main() {
+int main() {
     int x;
     x = 7 < 9;
     printint(x);
@@ -19,4 +19,6 @@ void main() {
     printint(x);
     x = 9 != 7;
     printint(x);
+
+    return 0;
 }

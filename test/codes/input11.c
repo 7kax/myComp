@@ -20,6 +20,7 @@ int main() {
     for (k = 1; k <= 5; k = k + 1) {
         printint(k);
     }
+    return 0;
     return (i);
     printint(12345);
     return (3);

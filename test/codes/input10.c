@@ -1,5 +1,5 @@
 void printint(long n);
-void main() {
+int main() {
     int i;
     char j;
 
@@ -14,4 +14,6 @@ void main() {
     for (j = -2; j != 2; j++) {
         printint(j);
     }
+
+    return 0;
 }

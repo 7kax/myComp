@@ -1,5 +1,5 @@
 void printint(long n);
-void main() {
+int main() {
     int x;
     x = 1;
     printint(x);
@@ -11,4 +11,6 @@ void main() {
     printint(x);
     x = x + 1;
     printint(x);
+
+    return 0;
 }

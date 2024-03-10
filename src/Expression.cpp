@@ -9,7 +9,7 @@ bool is_prefix_operator(TokenType type) {
     return type == TokenType::STAR || type == TokenType::AND ||
            type == TokenType::INVERT || type == TokenType::NOT ||
            type == TokenType::INC || type == TokenType::DEC ||
-           type == TokenType::MINUS;
+           type == TokenType::MINUS || type == TokenType::PLUS;
 }
 bool is_postfix_operator(TokenType type) {
     return type == TokenType::INC || type == TokenType::DEC;

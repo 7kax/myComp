@@ -1,10 +1,12 @@
 void printint(long n);
 int fred() { return (56); }
 
-void main() {
+int main() {
     int dummy;
     int result;
     printint(23);
     result = fred();
     printint(result);
+
+    return 0;
 }
