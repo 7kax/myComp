@@ -1,6 +1,9 @@
+#ifndef MYCOMP_ERRORS_H
+#define MYCOMP_ERRORS_H
+
+#include "Token.h"
 #include <exception>
 #include <string_view>
-#include "Token.h"
 
 namespace myComp {
 // Throw this exception when an unexpected token is found
@@ -115,3 +118,5 @@ class IOException : public std::exception {
     std::string msg_;
 };
 } // namespace myComp
+
+#endif

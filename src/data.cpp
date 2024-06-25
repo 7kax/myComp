@@ -11,19 +11,6 @@ const std::set<TokenType> data_types = {
     TokenType::LONG,
 };
 
-// Precedence of operators
-const std::map<ASTNodeType, int> precedence = {
-    {ASTNodeType::MULTIPLY, 3},     {ASTNodeType::DIVIDE, 3},
-    {ASTNodeType::MODULO, 3},       {ASTNodeType::ADD, 4},
-    {ASTNodeType::SUBTRACT, 4},     {ASTNodeType::L_SHIFT, 5},
-    {ASTNodeType::R_SHIFT, 5},      {ASTNodeType::LESS, 6},
-    {ASTNodeType::GREATER, 6},      {ASTNodeType::LESS_EQ, 6},
-    {ASTNodeType::GREATER_EQ, 6},   {ASTNodeType::EQUALS, 7},
-    {ASTNodeType::NEQ, 7},          {ASTNodeType::AND, 8},
-    {ASTNodeType::XOR, 9},          {ASTNodeType::OR, 10},
-    {ASTNodeType::LOGICAL_AND, 11}, {ASTNodeType::LOGICAL_OR, 12},
-    {ASTNodeType::ASSIGN, 14},
-};
 // Convert a token type to an AST node type
 const std::map<TokenType, ASTNodeType> token_to_op = {
     {TokenType::PLUS, ASTNodeType::ADD},

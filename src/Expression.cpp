@@ -4,6 +4,37 @@
 
 namespace {
 using namespace myComp;
+using namespace std;
+
+const unordered_map<ASTNodeType, int> lbp = {
+    {ASTNodeType::MULTIPLY, 25},   {ASTNodeType::DIVIDE, 25},
+    {ASTNodeType::MODULO, 25},     {ASTNodeType::ADD, 23},
+    {ASTNodeType::SUBTRACT, 23},   {ASTNodeType::L_SHIFT, 21},
+    {ASTNodeType::R_SHIFT, 21},    {ASTNodeType::LESS, 19},
+    {ASTNodeType::GREATER, 19},    {ASTNodeType::LESS_EQ, 19},
+    {ASTNodeType::GREATER_EQ, 19}, {ASTNodeType::EQUALS, 17},
+    {ASTNodeType::NEQ, 17},        {ASTNodeType::AND, 15},
+    {ASTNodeType::XOR, 13},        {ASTNodeType::OR, 11},
+    {ASTNodeType::LOGICAL_AND, 9}, {ASTNodeType::LOGICAL_OR, 7},
+    {ASTNodeType::ASSIGN, 6},
+};
+
+const unordered_map<ASTNodeType, int> rbp = {
+    {ASTNodeType::MULTIPLY, 26},    {ASTNodeType::DIVIDE, 26},
+    {ASTNodeType::MODULO, 26},      {ASTNodeType::ADD, 24},
+    {ASTNodeType::SUBTRACT, 24},    {ASTNodeType::L_SHIFT, 22},
+    {ASTNodeType::R_SHIFT, 22},     {ASTNodeType::LESS, 20},
+    {ASTNodeType::GREATER, 20},     {ASTNodeType::LESS_EQ, 20},
+    {ASTNodeType::GREATER_EQ, 20},  {ASTNodeType::EQUALS, 18},
+    {ASTNodeType::NEQ, 18},         {ASTNodeType::AND, 16},
+    {ASTNodeType::XOR, 14},         {ASTNodeType::OR, 12},
+    {ASTNodeType::LOGICAL_AND, 10}, {ASTNodeType::LOGICAL_OR, 8},
+    {ASTNodeType::ASSIGN, 5},
+};
+
+int get_lbp(ASTNodeType type) { return lbp.at(type); }
+int get_rbp(ASTNodeType type) { return rbp.at(type); }
+
 bool is_operator(TokenType type) { return token_to_op.contains(type); }
 bool is_prefix_operator(TokenType type) {
     return type == TokenType::STAR || type == TokenType::AND ||
@@ -15,7 +46,6 @@ bool is_postfix_operator(TokenType type) {
     return type == TokenType::INC || type == TokenType::DEC;
 }
 ASTNodeType token_to_op_(TokenType type) { return token_to_op.at(type); }
-int get_precedence(ASTNodeType type) { return precedence.at(type); }
 DereferenceNode *subscript_builder(const std::string &identifier,
                                    ExpressionNode *index) {
     Variable *var = VariableManager::find(identifier);
@@ -100,37 +130,31 @@ UnaryExpressionNode *unary_builder(ASTNodeType type, ExpressionNode *oprand) {
 } // namespace
 
 namespace myComp {
+
+// Implement the Pratt Parse algorithm
 ExpressionNode *Expression::build_tree(int pre_precedence) {
     ExpressionNode *left = primary();
 
-    // If the next token is not an operator, return the left node
-    if (!is_operator(token_processor_->peek_type()))
-        return left;
+    while (true) {
+        // If the next token is not an operator, return
+        if (!is_operator(token_processor_->peek_type()))
+            break;
 
-    // Get the binary operator
-    ASTNodeType operator_type = token_to_op_(token_processor_->peek_type());
+        // Get the binary operator
+        ASTNodeType operator_type = token_to_op_(token_processor_->peek_type());
 
-    while ((get_precedence(operator_type) < pre_precedence) ||
-           (pre_precedence == get_precedence(ASTNodeType::ASSIGN) &&
-            operator_type == ASTNodeType::ASSIGN)) {
+        // If the precedence is not high enough, return
+        if (get_lbp(operator_type) < pre_precedence)
+            break;
+
         // Fetch the next token
         auto [token, line] = this->token_processor_->next_token();
 
         // Build the right node
-        ExpressionNode *right = build_tree(get_precedence(operator_type));
-
-        // Do some type checking
-        // if (left->type()->is_void() || right->type()->is_void())
-        //     throw std::runtime_error(
-        //         "void value not ignored as it ought to be");
+        ExpressionNode *right = build_tree(get_rbp(operator_type));
 
         // Join the tree
         left = binary_builder(operator_type, left, right);
-
-        // Check if we need to continue
-        if (!is_operator(token_processor_->peek_type()))
-            return left;
-        operator_type = token_to_op_(token_processor_->peek_type());
     }
 
     return left;

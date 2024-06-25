@@ -4,8 +4,8 @@
 #include <map>
 #include <set>
 
-#include "Token.h"
 #include "ASTNode.h"
+#include "Token.h"
 
 namespace myComp {
 // Debug flag
@@ -13,9 +13,6 @@ extern bool debug;
 
 // Data type in tokens
 extern const std::set<TokenType> data_types;
-
-// Precedence of operators
-extern const std::map<ASTNodeType, int> precedence;
 
 // Convert a token type to an AST node type
 extern const std::map<TokenType, ASTNodeType> token_to_op;

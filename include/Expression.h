@@ -1,8 +1,10 @@
 #ifndef MYCOMP_EXPRESSION_H
 #define MYCOMP_EXPRESSION_H
 
-#include "TokenProcessor.h"
+#include <unordered_map>
+
 #include "ASTNode.h"
+#include "TokenProcessor.h"
 
 namespace myComp {
 class Expression {
@@ -23,7 +25,7 @@ class Expression {
     // Build the AST
     ExpressionNode *build_tree(int pre_precedence);
 
-    static constexpr int MAX_PRECEDENCE = 20;
+    static constexpr int MAX_PRECEDENCE = 0;
 };
 } // namespace myComp
 

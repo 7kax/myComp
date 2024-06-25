@@ -1,3 +1,6 @@
+#ifndef MYCOMP_X86_CODEGENERATOR_H
+#define MYCOMP_X86_CODEGENERATOR_H
+
 #include <array>
 #include <fstream>
 #include <string_view>
@@ -123,3 +126,5 @@ class X86_CodeGenerator final : public CodeGenerator {
     std::string variable_location(Variable *var);
 };
 } // namespace myComp
+
+#endif
