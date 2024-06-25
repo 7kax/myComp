@@ -1,5 +1,5 @@
 #include "TokenProcessor.h"
-
+#include "Errors.h"
 namespace myComp {
 
 void TokenProcessor::print(std::ostream &output) {
@@ -50,7 +50,7 @@ Type *TokenProcessor::next_data_type() {
         ret = TypeFactory::get_signed(8);
         break;
     default:
-        throw std::runtime_error("Invalid data type on line " + line);
+        throw InvalidException("data type", line);
     }
     // std::tie(token, line) = this->next_token();
     while (this->peek_token().first->type() == TokenType::STAR) {
@@ -63,7 +63,8 @@ Type *TokenProcessor::next_data_type() {
 std::string TokenProcessor::next_identifier() {
     auto [token, line] = this->next_token();
     if (token->type() != TokenType::IDENTIFIER) {
-        throw std::runtime_error("expect identifier but got " + token->str());
+        throw UnexpectedTokenException(token->type(), line,
+                                       TokenType::IDENTIFIER);
     }
     return token->string_val();
 }
@@ -71,17 +72,15 @@ std::string TokenProcessor::next_identifier() {
 void TokenProcessor::match(TokenType type) {
     auto [token, line] = this->next_token();
     if (token->type() != type) {
-        throw std::runtime_error("expect " + Token::token_str.at(type) +
-                                 " but got " + token->str() + " on line " +
-                                 std::to_string(line));
+        throw UnexpectedTokenException(token->type(), line, type);
     }
 }
 
 long long TokenProcessor::next_integer() {
     auto [token, line] = this->next_token();
     if (token->type() != TokenType::INT_LITERAL) {
-        throw std::runtime_error("expect integer literal but got " +
-                                 token->str());
+        throw UnexpectedTokenException(token->type(), line,
+                                       TokenType::INT_LITERAL);
     }
     return token->integer_val();
 }
@@ -89,8 +88,8 @@ long long TokenProcessor::next_integer() {
 std::string TokenProcessor::next_string() {
     auto [token, line] = this->next_token();
     if (token->type() != TokenType::STRING_LITERAL) {
-        throw std::runtime_error("expect string literal but got " +
-                                 token->str());
+        throw UnexpectedTokenException(token->type(), line,
+                                       TokenType::STRING_LITERAL);
     }
     return token->string_val();
 }

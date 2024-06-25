@@ -1,4 +1,5 @@
 #include "Scanner.h"
+#include "Errors.h"
 
 namespace myComp {
 const std::map<std::string, TokenType> Scanner::keywords = {
@@ -21,7 +22,7 @@ void Scanner::set_input(const std::string &filename) {
 
     // If the file cannot be opened, throw an error
     if (!this->input.is_open())
-        throw std::runtime_error("cannot open file " + filename);
+        throw IOException("cannot open file " + filename);
 }
 
 void Scanner::next() {
@@ -151,8 +152,7 @@ void Scanner::next() {
     case '\'':
         this->token = TokenFactory::getIntegerLiteral(scan_char());
         if (next_char() != '\'') {
-            throw std::runtime_error("expected closing single quote on line " +
-                                     std::to_string(this->line));
+            throw SyntaxException("expected closing '", this->line);
         }
         return;
     case '"':
@@ -174,8 +174,8 @@ void Scanner::next() {
         }
     }
     // If we reach here, there is an unrecognized token
-    throw std::runtime_error(std::string("unexpected character ") + ch +
-                             " on line " + std::to_string(this->line));
+    throw SyntaxException(std::string("unrecognized character ") + ch,
+                          this->line);
 }
 
 char Scanner::skip_white_space() {
@@ -265,7 +265,7 @@ int Scanner::scan_char() {
         case '\'':
             return '\'';
         default:
-            throw std::runtime_error("unknown escape sequence \\" + ch);
+            throw SyntaxException("invalid escape sequence", this->line);
         }
     }
     return ch;

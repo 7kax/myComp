@@ -1,5 +1,5 @@
 #include "Type.h"
-
+#include "Errors.h"
 namespace {
 bool is_double(const myComp::Type *type) {
     return type->is_float() && type->size() == 8;
@@ -15,6 +15,47 @@ bool same_signedness(const myComp::Type *a, const myComp::Type *b) {
 } // namespace
 
 namespace myComp {
+
+std::string SignedIntegerType::str() const {
+    switch (this->_size) {
+    case 1:
+        return "signed char";
+    case 2:
+        return "short";
+    case 4:
+        return "int";
+    case 8:
+        return "long";
+    default:
+        throw std::runtime_error("Invalid integer size");
+    }
+}
+
+std::string UnsignedIntegerType::str() const {
+    switch (this->_size) {
+    case 1:
+        return "unsigned char";
+    case 2:
+        return "unsigned short";
+    case 4:
+        return "unsigned int";
+    case 8:
+        return "unsigned long";
+    default:
+        throw std::runtime_error("Invalid integer size");
+    }
+}
+
+std::string FloatType::str() const {
+    switch (this->_size) {
+    case 4:
+        return "float";
+    case 8:
+        return "double";
+    default:
+        throw std::runtime_error("Invalid floating point size");
+    }
+}
 
 bool convertable_to(Type *src, Type *dest) {
     if (src == dest) {
@@ -96,8 +137,7 @@ Type *integer_promotion(Type *type) {
 
 Type *usual_arithmetic_conversion(Type *a, Type *b) {
     if (!(a->is_arithmetic() && b->is_arithmetic())) {
-        throw std::runtime_error(
-            "Invalid types for usual arithmetic conversion");
+        throw InvalidException("type of usual arithmetic conversion");
     }
     if (is_double(a) || is_double(b)) {
         return TypeFactory::get_float(8);

@@ -32,56 +32,19 @@ struct FunctionPrototype {
     std::string name_;
     std::vector<Variable *> parameters_;
 
-    std::string str() const {
-        std::string ret = return_type_->str();
-        ret += " " + name_ + "(";
-        for (auto &param : parameters_) {
-            ret += param->str() + ", ";
-        }
-        if (!parameters_.empty()) {
-            ret.pop_back();
-            ret.pop_back();
-        }
-        ret += ")";
-        return ret;
-    }
+    std::string str() const;
 };
 
 class FunctionManager {
   public:
-    static bool exists(const std::string &name) {
-        auto &cache = getCache();
-        return cache.find(name) != cache.end();
-    }
+    static bool exists(const std::string &name);
 
-    static void ensure_exists(const std::string &name) {
-        if (!exists(name)) {
-            throw std::runtime_error("function " + name + " not defined");
-        }
-    }
+    static void ensure_exists(const std::string &name);
 
-    static FunctionPrototype *find(const std::string &name) {
-        auto &cache = getCache();
-        auto it = cache.find(name);
-        if (it == cache.end()) {
-            return nullptr;
-        }
-        return it->second.get();
-    }
+    static FunctionPrototype *find(const std::string &name);
 
     static void insert(Type *return_type, const std::string &name,
-                       std::vector<Variable *> parameters) {
-        auto &cache = getCache();
-        auto it = cache.find(name);
-        if (it != cache.end()) {
-            throw std::runtime_error("function " + name + " already defined");
-        }
-        auto func = std::make_unique<FunctionPrototype>();
-        func->return_type_ = return_type;
-        func->name_ = name;
-        func->parameters_ = std::move(parameters);
-        cache[name] = std::move(func);
-    }
+                       std::vector<Variable *> parameters);
 
   private:
     static std::unordered_map<std::string, std::unique_ptr<FunctionPrototype>> &

@@ -1,6 +1,8 @@
 #include <algorithm>
+#include <source_location>
 
 #include "ASTNode.h"
+#include "Errors.h"
 
 namespace {
 using namespace myComp;
@@ -55,7 +57,7 @@ int pointer_compare(const BinaryExpressionNode *node,
 template <typename... Args>
 void oprand_type_check(std::string op, Args... args) {
     if (!(... || args)) {
-        throw std::runtime_error("invalid operands to " + op);
+        throw InvalidException("operands to " + op);
     }
 }
 
@@ -72,6 +74,10 @@ bool is_variable(ExpressionNode *node) {
 } // namespace
 
 namespace myComp {
+Type *CodeBlockNode::type() const {
+    throw LogicException("CodeBlockNode has no type");
+}
+
 std::optional<int>
 CodeBlockNode::generate_code(CodeGenerator *code_generator) const {
     for (auto &statement : statements_) {
@@ -130,6 +136,8 @@ void VariableDeclarationNode::print(std::ostream &os, int indent) const {
     os << std::string(indent, ' ') << "VariableDeclaration\n";
 }
 
+Type *IfNode::type() const { throw LogicException("IfNode has no type"); }
+
 std::optional<int> IfNode::generate_code(CodeGenerator *code_generator) const {
     std::string if_label = code_generator->allocate_label();
     int reg = condition_->generate_code(code_generator).value();
@@ -157,6 +165,8 @@ void IfNode::print(std::ostream &os, int indent) const {
     }
 }
 
+Type *WhileNode::type() const { throw LogicException("WhileNode has no type"); }
+
 std::optional<int>
 WhileNode::generate_code(CodeGenerator *code_generator) const {
     std::string start_label = code_generator->allocate_label();
@@ -175,6 +185,8 @@ void WhileNode::print(std::ostream &os, int indent) const {
     condition_->print(os, indent + 2);
     code_block_->print(os, indent + 2);
 }
+
+Type *ForNode::type() const { throw LogicException("ForNode has no type"); }
 
 std::optional<int> ForNode::generate_code(CodeGenerator *code_generator) const {
     std::string start_label = code_generator->allocate_label();
@@ -578,7 +590,7 @@ EqualsNode::generate_code(CodeGenerator *code_generator) const {
     }
 
     // This should never happen
-    throw std::runtime_error("Invalid operands to binary ==");
+    throw UnreachableException(std::source_location::current().function_name());
 }
 
 NotEqualsNode::NotEqualsNode(ExpressionNode *left, ExpressionNode *right)
@@ -613,7 +625,7 @@ NotEqualsNode::generate_code(CodeGenerator *code_generator) const {
     }
 
     // This should never happen
-    throw std::runtime_error("Invalid operands to binary !=");
+    throw UnreachableException(std::source_location::current().function_name());
 }
 
 NotNode::NotNode(ExpressionNode *oprand) : UnaryExpressionNode("!", oprand) {
@@ -885,14 +897,14 @@ void LiteralNode::print(std::ostream &os, int indent) const {
 
 long long LiteralNode::get_int_value() const {
     if (is_string_) {
-        throw std::runtime_error("string literal has no integer value");
+        throw LogicException("string literal has no integer value");
     }
     return int_value_;
 }
 
 std::string LiteralNode::get_string_value() const {
     if (!is_string_) {
-        throw std::runtime_error("integer literal has no string value");
+        throw LogicException("integer literal has no string value");
     }
     return string_value_;
 }

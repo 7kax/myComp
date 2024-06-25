@@ -136,20 +136,7 @@ class SignedIntegerType : public BasicType {
   public:
     explicit SignedIntegerType(size_t size) : _size(size) {}
 
-    std::string str() const override {
-        switch (this->_size) {
-        case 1:
-            return "signed char";
-        case 2:
-            return "short";
-        case 4:
-            return "int";
-        case 8:
-            return "long";
-        default:
-            throw std::runtime_error("Invalid integer size");
-        }
-    }
+    std::string str() const override;
 
     bool is_char() const override { return this->_size == 1; }
 
@@ -172,20 +159,7 @@ class UnsignedIntegerType : public BasicType {
   public:
     explicit UnsignedIntegerType(size_t size) : _size(size) {}
 
-    std::string str() const override {
-        switch (this->_size) {
-        case 1:
-            return "unsigned char";
-        case 2:
-            return "unsigned short";
-        case 4:
-            return "unsigned int";
-        case 8:
-            return "unsigned long";
-        default:
-            throw std::runtime_error("Invalid integer size");
-        }
-    }
+    std::string str() const override;
 
     bool is_char() const override { return this->_size == 1; }
 
@@ -208,16 +182,7 @@ class FloatType : public BasicType {
   public:
     explicit FloatType(size_t size) : _size(size) {}
 
-    std::string str() const override {
-        switch (this->_size) {
-        case 4:
-            return "float";
-        case 8:
-            return "double";
-        default:
-            throw std::runtime_error("Invalid floating point size");
-        }
-    }
+    std::string str() const override;
 
     bool is_char() const override { return false; }
 

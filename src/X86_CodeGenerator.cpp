@@ -1,21 +1,20 @@
 #include "X86_CodeGenerator.h"
 #include "data.h"
-
+#include "Errors.h"
 namespace myComp {
 void X86_CodeGenerator::set_output(std::string_view filename) {
     output_file_.open(filename.data());
     if (!output_file_.is_open()) {
-        throw std::runtime_error("Unable to open file " +
-                                 std::string(filename));
+        throw IOException("cannot open file " + std::string(filename));
     }
 }
 
 void X86_CodeGenerator::free_register(int reg) {
     if (reg < 0 || reg >= NUM_REGISTERS) {
-        throw std::runtime_error("Invalid register number");
+        throw InvalidException("register index " + std::to_string(reg));
     }
     if (free_registers_[reg]) {
-        throw std::runtime_error("Register already free");
+        throw LogicException("register double free");
     }
     free_registers_[reg] = true;
 }
@@ -517,7 +516,7 @@ int X86_CodeGenerator::logical_not(int reg, Type *type) {
 void X86_CodeGenerator::immediate_multiply(int reg, int val) {
     // If not power of 2, throw an error
     if (val % 2 != 0) {
-        throw std::runtime_error("Immediate value must be a power of 2");
+        throw LogicException("Immediate value must be a power of 2");
     }
 
     int shift = 0;
@@ -533,7 +532,7 @@ void X86_CodeGenerator::immediate_multiply(int reg, int val) {
 void X86_CodeGenerator::immediate_divide(int reg, int val) {
     // If not power of 2, throw an error
     if (val % 2 != 0) {
-        throw std::runtime_error("Immediate value must be a power of 2");
+        throw LogicException("Immediate value must be a power of 2");
     }
     int shift = 0;
     while (val % 2 == 0) {
@@ -940,7 +939,7 @@ std::string X86_CodeGenerator::get_reg_by_size(int reg, int size) {
     case 8:
         return registers[reg];
     default:
-        throw std::runtime_error("Invalid size");
+        throw LogicException("Invalid size");
     }
 }
 
@@ -951,7 +950,7 @@ int X86_CodeGenerator::allocate_register() {
             return i;
         }
     }
-    throw std::runtime_error("No free register");
+    throw LogicException("No free register");
 }
 
 void X86_CodeGenerator::free_all_registers() {
@@ -971,7 +970,7 @@ char X86_CodeGenerator::get_suffix_by_size(int size) {
     case 8:
         return 'q';
     default:
-        throw std::runtime_error("Invalid size");
+        throw LogicException("Invalid size");
     }
 }
 

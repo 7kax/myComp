@@ -38,12 +38,6 @@ def compile_and_run_test(test_file):
         # 立即退出
         exit(1)
 
-    # 删除生成的文件
-    if os.path.exists("out"):
-        os.remove("out")
-    if os.path.exists("out.s"):
-        os.remove("out.s")
-
 
 def main():
     # 找到所有的测试文件
@@ -53,6 +47,12 @@ def main():
 
     for test_file in test_files:
         compile_and_run_test(os.path.join("codes", test_file))
+
+    # 删除生成的文件
+    if os.path.exists("out"):
+        os.remove("out")
+    if os.path.exists("out.s"):
+        os.remove("out.s")
 
 
 if __name__ == "__main__":

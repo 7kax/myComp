@@ -1,6 +1,7 @@
 #include "Parser.h"
 #include "Context.h"
 #include "data.h"
+#include "Errors.h"
 
 namespace myComp {
 ASTNode_ *Parser::build_tree() {
@@ -87,7 +88,7 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
 
     // If the function is already declared, check if the return type matches
     if (declared && return_type != prototype->return_type_) {
-        throw std::runtime_error("return type mismatch in function " + name);
+        throw SyntaxException("return type mismatch in function " + name);
     }
 
     // Fetch the parameter list
@@ -103,8 +104,8 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
 
             // Check if the parameter type matches
             if (token_processor_->next_data_type() != type) {
-                throw std::runtime_error(
-                    "parameter type mismatch in function " + name);
+                throw SyntaxException("parameter type mismatch in function " +
+                                      name);
             }
 
             // If the parameter has a name, fill it in
@@ -154,8 +155,8 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
     for (const auto &parameters = prototype->parameters_;
          auto param : parameters) {
         if (param->name.empty())
-            throw std::runtime_error("parameter " + param->name +
-                                     " has no name");
+            throw SyntaxException("parameter " + param->name +
+                                  " must have a name");
     }
 
     // Build the code block
@@ -163,14 +164,14 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
 
     // Ensure non-void functions have a return statement
     if (!return_type->is_void() && !Context::has_return()) {
-        throw std::runtime_error("function " + name + " must return a value");
+        throw SyntaxException("non-void function " + name +
+                              " must have a return statement");
     }
 
     // Ensure void functions don't have a return statement
     if (return_type->is_void() && Context::has_return()) {
-        throw std::runtime_error("void function " + name +
-                                 " cannot return a "
-                                 "value");
+        throw SyntaxException("void function " + name +
+                              " cannot have a return statement");
     }
 
     // Pop the context
@@ -281,8 +282,8 @@ ReturnNode *Parser::return_statement() {
     if (!convertable_to(
             node->type(),
             FunctionManager::find(Context::get_name())->return_type_))
-        throw std::runtime_error("return type mismatch in function " +
-                                 Context::get_name());
+        throw SyntaxException("return type mismatch in function " +
+                              Context::get_name());
 
     // Set the return flag
     Context::set_return_flag();

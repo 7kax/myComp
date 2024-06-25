@@ -9,7 +9,7 @@ int main() {
     int zin;
     int cnt;
 
-    zin = open("./codes/input30.c", 0);
+    zin = open("./codes/read_write.c", 0);
     if (zin == -1) {
         return (1);
     }

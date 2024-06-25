@@ -1,6 +1,6 @@
 #include "Variable.h"
 #include "Context.h"
-
+#include "Errors.h"
 namespace myComp {
 Variable *VariableManager::find(const std::string &name) {
     auto &cache = getCache();
@@ -17,14 +17,14 @@ Variable *VariableManager::find(const std::string &name) {
         return it->second.get();
     }
 
-    throw std::runtime_error("Variable " + name + " not defined");
+    throw LogicException("Variable " + name + " not defined");
 }
 
 void VariableManager::insert(Type *type, const std::string &name,
                              const std::string &scope) {
     if (getCache().contains(scope + "_" + name)) {
-        throw std::runtime_error("Variable " + name +
-                                 " already defined in scope " + scope);
+        throw LogicException("Variable " + name + " already defined" + " in " +
+                             scope);
     }
 
     auto &cache = getCache();

@@ -111,10 +111,7 @@ class CodeBlockNode : public ASTNode_ {
     bool is_statement() const override { return false; }
     bool is_code_block() const override { return true; }
 
-    // Code block does not have a type
-    Type *type() const override {
-        throw std::logic_error("Try to get type of code block.");
-    }
+    Type *type() const override;
 
     std::optional<int>
     generate_code(CodeGenerator *code_generator) const override;
@@ -223,9 +220,7 @@ class IfNode : public StatementNode {
     bool is_for() const override { return false; }
     bool is_return() const override { return false; }
 
-    Type *type() const override {
-        throw std::logic_error("Try to get type of if statement.");
-    }
+    Type *type() const override;
 
     std::optional<int>
     generate_code(CodeGenerator *code_generator) const override;
@@ -255,9 +250,7 @@ class WhileNode : public StatementNode {
     bool is_for() const override { return false; }
     bool is_return() const override { return false; }
 
-    Type *type() const override {
-        throw std::logic_error("Try to get type of while statement.");
-    }
+    Type *type() const override;
 
     std::optional<int>
     generate_code(CodeGenerator *code_generator) const override;
@@ -290,9 +283,7 @@ class ForNode : public StatementNode {
     bool is_for() const override { return true; }
     bool is_return() const override { return false; }
 
-    Type *type() const override {
-        throw std::logic_error("Try to get type of for statement.");
-    }
+    Type *type() const override;
 
     std::optional<int>
     generate_code(CodeGenerator *code_generator) const override;

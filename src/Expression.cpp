@@ -1,5 +1,5 @@
 #include "Expression.h"
-
+#include "Errors.h"
 #include "data.h"
 
 namespace {
@@ -67,7 +67,7 @@ BinaryExpressionNode *binary_builder(ASTNodeType type, ExpressionNode *left,
     case ASTNodeType::ASSIGN:
         return new AssignNode(left, right);
     default:
-        throw std::runtime_error("Invalid binary operator");
+        throw InvalidException("binary operator");
     }
 }
 
@@ -94,7 +94,7 @@ UnaryExpressionNode *unary_builder(ASTNodeType type, ExpressionNode *oprand) {
     case ASTNodeType::POSITIVE:
         return new PositiveNode(oprand);
     default:
-        throw std::runtime_error("Invalid unary operator");
+        throw InvalidException("unary operator");
     }
 }
 } // namespace
@@ -120,9 +120,9 @@ ExpressionNode *Expression::build_tree(int pre_precedence) {
         ExpressionNode *right = build_tree(get_precedence(operator_type));
 
         // Do some type checking
-        if (left->type()->is_void() || right->type()->is_void())
-            throw std::runtime_error(
-                "void value not ignored as it ought to be");
+        // if (left->type()->is_void() || right->type()->is_void())
+        //     throw std::runtime_error(
+        //         "void value not ignored as it ought to be");
 
         // Join the tree
         left = binary_builder(operator_type, left, right);
@@ -164,9 +164,9 @@ ExpressionNode *Expression::primary() {
 
         return node;
     default:
-        throw std::runtime_error(
-            "Invalid primary expression on line " +
-            std::to_string(token_processor_->current_line()));
+        throw UnexpectedTokenException(token_processor_->peek_type(),
+                                       token_processor_->current_line(),
+                                       "primary expression");
     }
 
     return nullptr;
@@ -198,7 +198,7 @@ ExpressionNode *Expression::prefix() {
     case TokenType::DEC:
         return unary_builder(ASTNodeType::PRE_DEC, node);
     default:
-        throw std::runtime_error("Invalid prefix operator");
+        throw InvalidException("prefix operator");
     }
 
     return nullptr;
@@ -263,7 +263,7 @@ ExpressionNode *Expression::postfix(const std::string &identifier) {
     case TokenType::DEC:
         return new PostDecrementNode(new VariableNode(var));
     default:
-        throw std::runtime_error("Invalid postfix operator");
+        throw InvalidException("postfix operator");
     }
 
     return nullptr;
