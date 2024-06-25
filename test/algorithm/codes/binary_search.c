@@ -1,4 +1,5 @@
 void printf(char *fmt);
+void scanf(char *fmt);
 
 int binary_search(int *arr, int l, int r, int x) {
 
@@ -37,15 +38,21 @@ int main() {
 
     int i;
     for (i = 0; i < 10; i++) {
-        arr[i] = i * i;
+        scanf("%d", &arr[i]);
     }
 
-    int result1, result2;
-    result1 = do_binary_search(arr, 10, 25);
-    result2 = do_binary_search(arr, 10, 26);
+    int target1, target2, target3;
+    scanf("%d", &target1);
+    scanf("%d", &target2);
+    scanf("%d", &target3);
+    int result1, result2, result3;
+    result1 = do_binary_search(arr, 10, target1);
+    result2 = do_binary_search(arr, 10, target2);
+    result3 = do_binary_search(arr, 10, target3);
 
     print_result(result1);
     print_result(result2);
+    print_result(result3);
 
     return 0;
 }

@@ -1,1 +1,0 @@
-function fred not defined
