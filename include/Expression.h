@@ -2,6 +2,7 @@
 #define MYCOMP_EXPRESSION_H
 
 #include <unordered_map>
+#include <unordered_set>
 
 #include "ASTNode.h"
 #include "TokenProcessor.h"

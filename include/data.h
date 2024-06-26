@@ -14,9 +14,6 @@ extern bool debug;
 // Data type in tokens
 extern const std::set<TokenType> data_types;
 
-// Convert a token type to an AST node type
-extern const std::map<TokenType, ASTNodeType> token_to_op;
-
 // Convert an AST node type to a string
 extern const std::map<ASTNodeType, const char *> ASTNode_str;
 

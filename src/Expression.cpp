@@ -8,6 +8,7 @@ namespace {
 using namespace myComp;
 using namespace std;
 
+// Left and right precedences of binary operators
 const unordered_map<ASTNodeType, int> lbp = {
     {ASTNodeType::MULTIPLY, 25},   {ASTNodeType::DIVIDE, 25},
     {ASTNodeType::MODULO, 25},     {ASTNodeType::ADD, 23},
@@ -37,17 +38,50 @@ const unordered_map<ASTNodeType, int> rbp = {
 int get_lbp(ASTNodeType type) { return lbp.at(type); }
 int get_rbp(ASTNodeType type) { return rbp.at(type); }
 
+// Get binary operators from token
+const unordered_map<TokenType, ASTNodeType> token_to_op = {
+    {TokenType::PLUS, ASTNodeType::ADD},
+    {TokenType::MINUS, ASTNodeType::SUBTRACT},
+    {TokenType::STAR, ASTNodeType::MULTIPLY},
+    {TokenType::SLASH, ASTNodeType::DIVIDE},
+    {TokenType::MOD, ASTNodeType::MODULO},
+    {TokenType::EQUALS, ASTNodeType::EQUALS},
+    {TokenType::NEQ, ASTNodeType::NEQ},
+    {TokenType::LESS, ASTNodeType::LESS},
+    {TokenType::GREATER, ASTNodeType::GREATER},
+    {TokenType::LESS_EQ, ASTNodeType::LESS_EQ},
+    {TokenType::GREATER_EQ, ASTNodeType::GREATER_EQ},
+    {TokenType::ASSIGN, ASTNodeType::ASSIGN},
+    {TokenType::AND, ASTNodeType::AND},
+    {TokenType::LOGICAL_AND, ASTNodeType::LOGICAL_AND},
+    {TokenType::OR, ASTNodeType::OR},
+    {TokenType::LOGICAL_OR, ASTNodeType::LOGICAL_OR},
+    {TokenType::XOR, ASTNodeType::XOR},
+    {TokenType::L_SHIFT, ASTNodeType::L_SHIFT},
+    {TokenType::R_SHIFT, ASTNodeType::R_SHIFT},
+};
+
 bool is_operator(TokenType type) { return token_to_op.contains(type); }
-bool is_prefix_operator(TokenType type) {
-    return type == TokenType::STAR || type == TokenType::AND ||
-           type == TokenType::INVERT || type == TokenType::NOT ||
-           type == TokenType::INC || type == TokenType::DEC ||
-           type == TokenType::MINUS || type == TokenType::PLUS;
-}
-bool is_postfix_operator(TokenType type) {
-    return type == TokenType::INC || type == TokenType::DEC;
-}
 ASTNodeType token_to_op_(TokenType type) { return token_to_op.at(type); }
+
+// Prefix op
+const unordered_set<TokenType> prefix_operators = {
+    TokenType::STAR, TokenType::AND, TokenType::INVERT, TokenType::NOT,
+    TokenType::INC,  TokenType::DEC, TokenType::MINUS,  TokenType::PLUS,
+};
+
+bool is_prefix_operator(TokenType type) {
+    return prefix_operators.contains(type);
+}
+
+// Postfix op
+const unordered_set<TokenType> postfix_operators = {TokenType::INC,
+                                                    TokenType::DEC};
+
+bool is_postfix_operator(TokenType type) {
+    return postfix_operators.contains(type);
+}
+
 DereferenceNode *subscript_builder(const string &identifier,
                                    ExpressionNode *index) {
     Variable *var = VariableManager::find(identifier);
@@ -183,11 +217,8 @@ ExpressionNode *Expression::primary() {
     }
     case TokenType::LPAREN: {
         token_processor_->lparen();
-
         ExpressionNode *node = build_tree(Expression::MAX_PRECEDENCE);
-
         token_processor_->rparen();
-
         return node;
     }
     default: {
@@ -240,18 +271,14 @@ ExpressionNode *Expression::identifier() {
         FunctionManager::ensure_exists(str);
 
         token_processor_->lparen();
-
         vector<ExpressionNode *> arguments = parse_arguments();
-
         token_processor_->rparen();
 
         return new FunctionCallNode(str, arguments);
     }
     case TokenType::LBRACKET: {
         token_processor_->lbracket();
-
         ExpressionNode *node = build_tree(Expression::MAX_PRECEDENCE);
-
         token_processor_->rbracket();
         return subscript_builder(str, node);
     }

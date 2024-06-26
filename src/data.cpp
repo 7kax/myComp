@@ -11,29 +11,6 @@ const std::set<TokenType> data_types = {
     TokenType::LONG,
 };
 
-// Convert a token type to an AST node type
-const std::map<TokenType, ASTNodeType> token_to_op = {
-    {TokenType::PLUS, ASTNodeType::ADD},
-    {TokenType::MINUS, ASTNodeType::SUBTRACT},
-    {TokenType::STAR, ASTNodeType::MULTIPLY},
-    {TokenType::SLASH, ASTNodeType::DIVIDE},
-    {TokenType::MOD, ASTNodeType::MODULO},
-    {TokenType::EQUALS, ASTNodeType::EQUALS},
-    {TokenType::NEQ, ASTNodeType::NEQ},
-    {TokenType::LESS, ASTNodeType::LESS},
-    {TokenType::GREATER, ASTNodeType::GREATER},
-    {TokenType::LESS_EQ, ASTNodeType::LESS_EQ},
-    {TokenType::GREATER_EQ, ASTNodeType::GREATER_EQ},
-    {TokenType::ASSIGN, ASTNodeType::ASSIGN},
-    {TokenType::AND, ASTNodeType::AND},
-    {TokenType::LOGICAL_AND, ASTNodeType::LOGICAL_AND},
-    {TokenType::OR, ASTNodeType::OR},
-    {TokenType::LOGICAL_OR, ASTNodeType::LOGICAL_OR},
-    {TokenType::XOR, ASTNodeType::XOR},
-    {TokenType::L_SHIFT, ASTNodeType::L_SHIFT},
-    {TokenType::R_SHIFT, ASTNodeType::R_SHIFT},
-};
-
 // Convert an AST node type to a string
 const std::map<ASTNodeType, const char *> ASTNode_str = {
     {ASTNodeType::ADD, "add"},
@@ -84,18 +61,6 @@ const std::map<ASTNodeType, const char *> ASTNode_str = {
 // String literals
 std::map<std::string, std::string> string_literals;
 
-// Generate code
-// Generator generator;
-
 // Assembly code generator
 CodeGenerator *code_generator;
-
-// Symbol table for functions
-// std::map<std::string, SymbolTable> symbol_tables;
-
-// Function
-// Function function;
-
-// Context
-// Context context;
 } // namespace myComp
