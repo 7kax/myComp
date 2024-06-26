@@ -2,6 +2,8 @@
 #include "Errors.h"
 #include "data.h"
 
+using namespace std;
+
 namespace {
 using namespace myComp;
 using namespace std;
@@ -46,7 +48,7 @@ bool is_postfix_operator(TokenType type) {
     return type == TokenType::INC || type == TokenType::DEC;
 }
 ASTNodeType token_to_op_(TokenType type) { return token_to_op.at(type); }
-DereferenceNode *subscript_builder(const std::string &identifier,
+DereferenceNode *subscript_builder(const string &identifier,
                                    ExpressionNode *index) {
     Variable *var = VariableManager::find(identifier);
 
@@ -148,7 +150,7 @@ ExpressionNode *Expression::build_tree(int pre_precedence) {
             break;
 
         // Fetch the next token
-        auto [token, line] = this->token_processor_->next_token();
+        auto [token, line] = token_processor_->next_token();
 
         // Build the right node
         ExpressionNode *right = build_tree(get_rbp(operator_type));
@@ -165,34 +167,35 @@ ExpressionNode *Expression::primary() {
     if (ExpressionNode *pref = prefix(); pref != nullptr)
         return pref;
 
-    long long val;
-    std::string str;
-    ExpressionNode *node;
     switch (token_processor_->peek_type()) {
-    case TokenType::INT_LITERAL:
-        val = this->token_processor_->next_integer();
+    case TokenType::INT_LITERAL: {
+        long long val = token_processor_->next_integer();
         return new LiteralNode(int_literal_type(val), val);
-    case TokenType::STRING_LITERAL:
-        str = this->token_processor_->next_string();
+    }
+    case TokenType::STRING_LITERAL: {
+        string str = token_processor_->next_string();
         string_literals.insert({str, {}});
         return new LiteralNode(
             TypeFactory::get_pointer(TypeFactory::get_char()), str);
-    case TokenType::IDENTIFIER:
+    }
+    case TokenType::IDENTIFIER: {
         return identifier();
-    case TokenType::LPAREN:
-        this->token_processor_->lparen();
+    }
+    case TokenType::LPAREN: {
+        token_processor_->lparen();
 
-        node = build_tree(Expression::MAX_PRECEDENCE);
+        ExpressionNode *node = build_tree(Expression::MAX_PRECEDENCE);
 
-        this->token_processor_->rparen();
+        token_processor_->rparen();
 
         return node;
-    default:
-        throw UnexpectedTokenException(token_processor_->peek_type(),
-                                       token_processor_->current_line(),
+    }
+    default: {
+        auto [type, line] = token_processor_->peek_token();
+        throw UnexpectedTokenException(type->type(), line,
                                        "primary expression");
     }
-
+    }
     return nullptr;
 }
 
@@ -201,7 +204,7 @@ ExpressionNode *Expression::prefix() {
     if (!is_prefix_operator(token_processor_->peek_type()))
         return nullptr;
 
-    auto [token, line] = this->token_processor_->next_token();
+    auto [token, line] = token_processor_->next_token();
     ExpressionNode *node = primary();
 
     switch (token->type()) {
@@ -229,58 +232,58 @@ ExpressionNode *Expression::prefix() {
 }
 
 ExpressionNode *Expression::identifier() {
-    std::string str = this->token_processor_->next_identifier();
+    string str = token_processor_->next_identifier();
 
-    std::vector<ExpressionNode *> arguments;
-    ExpressionNode *node;
     switch (token_processor_->peek_type()) {
-    case TokenType::LPAREN:
+    case TokenType::LPAREN: {
         // Ensure the function prototype exists
         FunctionManager::ensure_exists(str);
 
-        this->token_processor_->lparen();
+        token_processor_->lparen();
 
-        arguments = parse_arguments();
+        vector<ExpressionNode *> arguments = parse_arguments();
 
-        this->token_processor_->rparen();
+        token_processor_->rparen();
 
         return new FunctionCallNode(str, arguments);
+    }
+    case TokenType::LBRACKET: {
+        token_processor_->lbracket();
 
-    case TokenType::LBRACKET:
-        this->token_processor_->lbracket();
+        ExpressionNode *node = build_tree(Expression::MAX_PRECEDENCE);
 
-        node = build_tree(Expression::MAX_PRECEDENCE);
-
-        this->token_processor_->rbracket();
+        token_processor_->rbracket();
         return subscript_builder(str, node);
-    default:
+    }
+    default: {
         if (ExpressionNode *postf = postfix(str); postf != nullptr)
             return postf;
         Variable *var = VariableManager::find(str);
 
         return new VariableNode(var);
     }
+    }
 }
 
-std::vector<ExpressionNode *> Expression::parse_arguments() {
-    std::vector<ExpressionNode *> arguments;
+vector<ExpressionNode *> Expression::parse_arguments() {
+    vector<ExpressionNode *> arguments;
     while (token_processor_->peek_type() != TokenType::RPAREN) {
         ExpressionNode *param = build_tree(Expression::MAX_PRECEDENCE);
         arguments.push_back(param);
         if (token_processor_->peek_type() != TokenType::RPAREN)
-            this->token_processor_->comma();
+            token_processor_->comma();
     }
 
     return arguments;
 }
 
-ExpressionNode *Expression::postfix(const std::string &identifier) {
+ExpressionNode *Expression::postfix(const string &identifier) {
     if (!is_postfix_operator(token_processor_->peek_type()))
         return nullptr;
 
     Variable *var = VariableManager::find(identifier);
 
-    auto [token, line] = this->token_processor_->next_token();
+    auto [token, line] = token_processor_->next_token();
     switch (token->type()) {
     case TokenType::INC:
         return new PostIncrementNode(new VariableNode(var));
