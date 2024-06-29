@@ -1,8 +1,14 @@
 #include "Scanner.h"
 #include "Errors.h"
 
-namespace myComp {
-const std::map<std::string, TokenType> Scanner::keywords = {
+using namespace std;
+
+namespace {
+using namespace myComp;
+using namespace std;
+
+// List of keywords
+const unordered_map<string, TokenType> keywords = {
     // Types
     {"void", TokenType::VOID},
     {"int", TokenType::INT},
@@ -15,235 +21,210 @@ const std::map<std::string, TokenType> Scanner::keywords = {
     {"for", TokenType::FOR},
     {"return", TokenType::RETURN},
 };
+} // namespace
 
-void Scanner::set_input(const std::string &filename) {
+namespace myComp {
+void Scanner::set_input(const string &filename) {
     // Open the input file
-    this->input.open(filename);
+    _input.open(filename);
 
     // If the file cannot be opened, throw an error
-    if (!this->input.is_open())
+    if (!_input.is_open())
         throw IOException("cannot open file " + filename);
 }
 
 void Scanner::next() {
-    // Skip whitespace and get the first character
-    char ch = skip_white_space();
+    // Skip whitespace and peek the first character
+    int ch = next_char();
 
     // Determine the type based on the first character
     switch (ch) {
-    case EOF:
-        this->token = TokenFactory::getToken(TokenType::T_EOF);
+    case char_traits<char>::eof():
+        _token = TokenFactory::getToken(TokenType::T_EOF);
         return;
     case '*':
-        this->token = TokenFactory::getToken(TokenType::STAR);
+        _token = TokenFactory::getToken(TokenType::STAR);
         return;
     case '/':
-        this->token = TokenFactory::getToken(TokenType::SLASH);
+        _token = TokenFactory::getToken(TokenType::SLASH);
         return;
     case '%':
-        this->token = TokenFactory::getToken(TokenType::MOD);
+        _token = TokenFactory::getToken(TokenType::MOD);
         return;
     case '^':
-        this->token = TokenFactory::getToken(TokenType::XOR);
+        _token = TokenFactory::getToken(TokenType::XOR);
         return;
     case '~':
-        this->token = TokenFactory::getToken(TokenType::INVERT);
+        _token = TokenFactory::getToken(TokenType::INVERT);
         return;
     case ';':
-        this->token = TokenFactory::getToken(TokenType::SEMI);
+        _token = TokenFactory::getToken(TokenType::SEMI);
         return;
     case ',':
-        this->token = TokenFactory::getToken(TokenType::COMMA);
+        _token = TokenFactory::getToken(TokenType::COMMA);
         return;
     case '{':
-        this->token = TokenFactory::getToken(TokenType::LBRACE);
+        _token = TokenFactory::getToken(TokenType::LBRACE);
         return;
     case '}':
-        this->token = TokenFactory::getToken(TokenType::RBRACE);
+        _token = TokenFactory::getToken(TokenType::RBRACE);
         return;
     case '(':
-        this->token = TokenFactory::getToken(TokenType::LPAREN);
+        _token = TokenFactory::getToken(TokenType::LPAREN);
         return;
     case ')':
-        this->token = TokenFactory::getToken(TokenType::RPAREN);
+        _token = TokenFactory::getToken(TokenType::RPAREN);
         return;
     case '[':
-        this->token = TokenFactory::getToken(TokenType::LBRACKET);
+        _token = TokenFactory::getToken(TokenType::LBRACKET);
         return;
     case ']':
-        this->token = TokenFactory::getToken(TokenType::RBRACKET);
+        _token = TokenFactory::getToken(TokenType::RBRACKET);
         return;
     case '+':
-        ch = next_char();
-        if (ch == '+')
-            this->token = TokenFactory::getToken(TokenType::INC);
-        else {
-            doPutback(ch);
-            this->token = TokenFactory::getToken(TokenType::PLUS);
+        ch = _input.peek();
+        if (ch == '+') {
+            _input.get();
+            _token = TokenFactory::getToken(TokenType::INC);
+        } else {
+            _token = TokenFactory::getToken(TokenType::PLUS);
         }
         return;
     case '-':
-        ch = next_char();
-        if (ch == '-')
-            this->token = TokenFactory::getToken(TokenType::DEC);
-        else {
-            doPutback(ch);
-            this->token = TokenFactory::getToken(TokenType::MINUS);
+        ch = _input.peek();
+        if (ch == '-') {
+            _input.get();
+            _token = TokenFactory::getToken(TokenType::DEC);
+        } else {
+            _token = TokenFactory::getToken(TokenType::MINUS);
         }
         return;
     case '|':
-        ch = next_char();
-        if (ch == '|')
-            this->token = TokenFactory::getToken(TokenType::LOGICAL_OR);
-        else {
-            doPutback(ch);
-            this->token = TokenFactory::getToken(TokenType::OR);
+        ch = _input.peek();
+        if (ch == '|') {
+            _input.get();
+            _token = TokenFactory::getToken(TokenType::LOGICAL_OR);
+        } else {
+            _token = TokenFactory::getToken(TokenType::OR);
         }
         return;
     case '&':
-        ch = next_char();
-        if (ch == '&')
-            this->token = TokenFactory::getToken(TokenType::LOGICAL_AND);
-        else {
-            doPutback(ch);
-            this->token = TokenFactory::getToken(TokenType::AND);
+        ch = _input.peek();
+        if (ch == '&') {
+            _input.get();
+            _token = TokenFactory::getToken(TokenType::LOGICAL_AND);
+        } else {
+            _token = TokenFactory::getToken(TokenType::AND);
         }
         return;
     case '=':
-        ch = next_char();
-        if (ch == '=')
-            this->token = TokenFactory::getToken(TokenType::EQUALS);
-        else {
-            doPutback(ch);
-            this->token = TokenFactory::getToken(TokenType::ASSIGN);
+        ch = _input.peek();
+        if (ch == '=') {
+            _input.get();
+            _token = TokenFactory::getToken(TokenType::EQUALS);
+        } else {
+            _token = TokenFactory::getToken(TokenType::ASSIGN);
         }
         return;
     case '!':
-        ch = next_char();
-        if (ch == '=')
-            this->token = TokenFactory::getToken(TokenType::NEQ);
-        else {
-            doPutback(ch);
-            this->token = TokenFactory::getToken(TokenType::NOT);
+        ch = _input.peek();
+        if (ch == '=') {
+            _input.get();
+            _token = TokenFactory::getToken(TokenType::NEQ);
+        } else {
+            _token = TokenFactory::getToken(TokenType::NOT);
         }
         return;
     case '<':
-        ch = next_char();
-        if (ch == '=')
-            this->token = TokenFactory::getToken(TokenType::LESS_EQ);
-        else if (ch == '<')
-            this->token = TokenFactory::getToken(TokenType::L_SHIFT);
-        else {
-            doPutback(ch);
-            this->token = TokenFactory::getToken(TokenType::LESS);
+        ch = _input.peek();
+        if (ch == '=') {
+            _input.get();
+            _token = TokenFactory::getToken(TokenType::LESS_EQ);
+        } else if (ch == '<') {
+            _input.get();
+            _token = TokenFactory::getToken(TokenType::L_SHIFT);
+        } else {
+            _token = TokenFactory::getToken(TokenType::LESS);
         }
         return;
     case '>':
-        ch = next_char();
-        if (ch == '=')
-            this->token = TokenFactory::getToken(TokenType::GREATER_EQ);
-        else if (ch == '>')
-            this->token = TokenFactory::getToken(TokenType::R_SHIFT);
-        else {
-            doPutback(ch);
-            this->token = TokenFactory::getToken(TokenType::GREATER);
+        ch = _input.peek();
+        if (ch == '=') {
+            _input.get();
+            _token = TokenFactory::getToken(TokenType::GREATER_EQ);
+        } else if (ch == '>') {
+            _input.get();
+            _token = TokenFactory::getToken(TokenType::R_SHIFT);
+        } else {
+            _token = TokenFactory::getToken(TokenType::GREATER);
         }
         return;
     case '\'':
-        this->token = TokenFactory::getIntegerLiteral(scan_char());
-        if (next_char() != '\'') {
-            throw SyntaxException("expected closing '", this->line);
-        }
+        _token = TokenFactory::getIntegerLiteral(scan_char());
         return;
     case '"':
-        this->token = TokenFactory::getStringLiteral(scan_string());
+        _token = TokenFactory::getStringLiteral(scan_string());
         return;
     default:
-        if (std::isdigit(ch)) {
-            this->token = TokenFactory::getIntegerLiteral(scan_int(ch));
+        if (isdigit(ch)) {
+            _token = TokenFactory::getIntegerLiteral(scan_int(ch));
             return;
         }
 
-        if (std::isalpha(ch) || ch == '_') {
-            if (std::string str = scan_identifier(ch); keywords.contains(str)) {
-                this->token = TokenFactory::getToken(keywords.at(str));
+        if (isalpha(ch) || ch == '_') {
+            if (string str = scan_identifier(ch); keywords.contains(str)) {
+                _token = TokenFactory::getToken(keywords.at(str));
             } else {
-                this->token = TokenFactory::getIdentifier(str);
+                _token = TokenFactory::getIdentifier(str);
             }
             return;
         }
     }
+
     // If we reach here, there is an unrecognized token
-    throw SyntaxException(std::string("unrecognized character ") + ch,
-                          this->line);
+    throw SyntaxException("unrecognized character " + to_string(ch), _line);
 }
 
-char Scanner::skip_white_space() {
-    char ch = next_char();
-
-    // Skip whitespace
-    while (std::isspace(ch))
-        ch = next_char();
-
-    return ch;
-}
-
-char Scanner::next_char() {
-    // If we have a character put back, return it
-    if (this->putback) {
-        this->putback = false;
-        return this->putback_char;
+int Scanner::next_char() {
+    while (isspace(_input.peek())) {
+        if (_input.peek() == '\n')
+            _line++;
+        _input.get();
     }
 
-    // Otherwise, get the next character from the input
-    char ch = static_cast<char>(this->input.get());
-
-    // If we reach the end of the line, post_increment the line number
-    if (ch == '\n')
-        this->line++;
-
-    return ch;
+    return _input.get();
 }
 
-int Scanner::scan_int(char c) {
-    int k = 0;
+int Scanner::scan_int(int c) {
+    int k = c - '0';
 
     // Convert each character into an integer and add it to the total
-    while (std::isdigit(c)) {
+    while (isdigit(_input.peek())) {
+        c = _input.get();
         k = k * 10 + (c - '0');
-        c = next_char();
     }
-
-    // Put back the last character
-    doPutback(c);
 
     return k;
 }
 
-std::string Scanner::scan_identifier(char c) {
-    std::string identifier;
+string Scanner::scan_identifier(int c) {
+    string identifier{static_cast<char>(c)};
 
     // Add each character to the identifier
-    while (std::isalnum(c) || c == '_') {
-        identifier += c;
-        c = next_char();
+    while (isalnum(_input.peek()) || _input.peek() == '_') {
+        identifier += _input.get();
     }
-
-    // Put back the last character
-    doPutback(c);
 
     return identifier;
 }
 
-void Scanner::doPutback(char c) {
-    putback = true;
-    putback_char = c;
-}
+int Scanner::scan_escape_sequence() {
+    int ch = _input.get();
 
-int Scanner::scan_char() {
-    char ch = next_char();
+    // Deal with escape sequences
     if (ch == '\\') {
-        switch (ch = next_char()) {
+        ch = _input.get();
+        switch (ch) {
         case 'a':
             return '\a';
         case 'b':
@@ -265,16 +246,27 @@ int Scanner::scan_char() {
         case '\'':
             return '\'';
         default:
-            throw SyntaxException("invalid escape sequence", this->line);
+            throw SyntaxException("invalid escape sequence", _line);
         }
     }
+
     return ch;
 }
 
-std::string Scanner::scan_string() {
-    std::string str;
-    char ch;
-    while ((ch = static_cast<char>(scan_char())) != '"') {
+int Scanner::scan_char() {
+    int ch = scan_escape_sequence();
+
+    // Ensure that the character is closed
+    if (_input.get() != '\'')
+        throw SyntaxException("expected closing '", _line);
+
+    return ch;
+}
+
+string Scanner::scan_string() {
+    string str;
+    int ch;
+    while ((ch = scan_escape_sequence()) != '"') {
         str += ch;
     }
     return str;

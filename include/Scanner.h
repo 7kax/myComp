@@ -10,31 +10,20 @@ namespace myComp {
 class Scanner {
   private:
     // The next type
-    Token *token = nullptr;
+    Token *_token = nullptr;
 
     // The input file
-    std::ifstream input;
-
-    // Whether we should put the character back
-    bool putback = false;
-
-    // The character to put back
-    char putback_char = '\n';
+    std::ifstream _input;
 
     // The current line number
-    int line = 1;
-
-    // List of keywords
-    static const std::map<std::string, TokenType> keywords;
+    int _line = 1;
 
     // Get the next character from the input
-    char next_char();
-
-    // Skip whitespace and get the first character
-    char skip_white_space();
+    // Ignore whitespace and increment line number
+    int next_char();
 
     // Scan an integer literal
-    int scan_int(char c);
+    int scan_int(int c);
 
     // Scan a character literal
     int scan_char();
@@ -43,10 +32,10 @@ class Scanner {
     std::string scan_string();
 
     // Scan an identifier
-    std::string scan_identifier(char c);
+    std::string scan_identifier(int c);
 
-    // Put back a character
-    void doPutback(char c);
+    // Scan an escape sequence
+    int scan_escape_sequence();
 
   public:
     // Set the input file
@@ -56,13 +45,13 @@ class Scanner {
     void next();
 
     // Get the current token
-    [[nodiscard]] Token *get_token() { return this->token; }
+    [[nodiscard]] Token *get_token() { return _token; }
 
     // Get line number
-    [[nodiscard]] int get_line() const { return this->line; }
+    [[nodiscard]] int get_line() const { return _line; }
 
     // Destructor: close the input file
-    ~Scanner() { input.close(); }
+    ~Scanner() { _input.close(); }
 };
 } // namespace myComp
 
