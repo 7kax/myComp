@@ -159,6 +159,18 @@ void Scanner::next() {
             _token = TokenFactory::getToken(TokenType::GREATER);
         }
         return;
+    case '.':
+        ch = _input.peek();
+        if (ch == '.') {
+            _input.get();
+            ch = _input.get();
+            if (ch != '.')
+                break;
+            _token = TokenFactory::getToken(TokenType::ELLIPSIS);
+        } else {
+            _token = TokenFactory::getToken(TokenType::DOT);
+        }
+        return;
     case '\'':
         _token = TokenFactory::getIntegerLiteral(scan_char());
         return;

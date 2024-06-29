@@ -42,6 +42,8 @@ enum class TokenType {
     COMMA,
     LBRACKET,
     RBRACKET,
+    ELLIPSIS,
+    DOT,
     // Keywords: control flow
     WHILE,
     FOR,
