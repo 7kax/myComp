@@ -1,8 +1,8 @@
 #ifndef MYCOMP_CONTEXT_H
 #define MYCOMP_CONTEXT_H
 
-#include <utility>
 #include <stack>
+#include <utility>
 
 #include "Variable.h"
 
@@ -31,6 +31,7 @@ struct FunctionPrototype {
     Type *return_type_ = nullptr;
     std::string name_;
     std::vector<Variable *> parameters_;
+    bool is_variadic_ = false;
 
     std::string str() const;
 };
@@ -44,7 +45,7 @@ class FunctionManager {
     static FunctionPrototype *find(const std::string &name);
 
     static void insert(Type *return_type, const std::string &name,
-                       std::vector<Variable *> parameters);
+                       std::vector<Variable *> parameters, bool is_variadic);
 
   private:
     static std::unordered_map<std::string, std::unique_ptr<FunctionPrototype>> &

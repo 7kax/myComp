@@ -1,12 +1,14 @@
 #include "Parser.h"
 #include "Context.h"
-#include "data.h"
 #include "Errors.h"
+#include "data.h"
+
+using namespace std;
 
 namespace myComp {
 ASTNode_ *Parser::build_tree() {
     Type *data_type = token_processor_->next_data_type();
-    std::string identifier = token_processor_->next_identifier();
+    string identifier = token_processor_->next_identifier();
 
     if (token_processor_->peek_type() != TokenType::LPAREN) {
         return variable_declaration(data_type, identifier);
@@ -16,7 +18,7 @@ ASTNode_ *Parser::build_tree() {
 
 // todo: optimize this function
 VariableDeclarationNode *Parser::variable_declaration(Type *data_type,
-                                                      std::string &name) {
+                                                      string &name) {
     if (token_processor_->peek_type() == TokenType::LBRACKET) {
 
         token_processor_->lbracket();
@@ -57,7 +59,7 @@ VariableDeclarationNode *Parser::variable_declaration() {
 
     // Build the tree
     while (token_processor_->peek_type() != TokenType::SEMI) {
-        std::string name = token_processor_->next_identifier();
+        string name = token_processor_->next_identifier();
         if (token_processor_->peek_type() == TokenType::LBRACKET) {
             token_processor_->lbracket();
             int size = static_cast<int>(token_processor_->next_integer());
@@ -78,7 +80,7 @@ VariableDeclarationNode *Parser::variable_declaration() {
 }
 
 FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
-                                                     const std::string &name) {
+                                                     const string &name) {
     // Set the context
     Context::push(name);
 
@@ -98,9 +100,9 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
     // Fill in the name of the parameters
     if (declared) {
         // Update the parameter list
-        for (auto &parameters = prototype->parameters_;
-             auto &parameter : parameters) {
-            Type *type = parameter->type;
+        auto &parameters = prototype->parameters_;
+        for (int i = 0; i < parameters.size(); i++) {
+            Type *type = parameters[i]->type;
 
             // Check if the parameter type matches
             if (token_processor_->next_data_type() != type) {
@@ -110,21 +112,34 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
 
             // If the parameter has a name, fill it in
             if (token_processor_->peek_type() == TokenType::IDENTIFIER) {
-                parameter->name = token_processor_->next_identifier();
+                parameters[i]->name = token_processor_->next_identifier();
             }
 
-            if (token_processor_->peek_type() != TokenType::RPAREN)
+            if (i != parameters.size() - 1)
                 token_processor_->comma();
+            else if (prototype->is_variadic_) {
+                token_processor_->comma();
+                token_processor_->ellipsis();
+            }
         }
     } else {
 
         // If the function is not declared, build the parameter list
-        std::vector<Variable *> parameters;
+        vector<Variable *> parameters;
+        bool is_variadic = false;
         while (token_processor_->peek_type() != TokenType::RPAREN) {
+
+            // If the next token is an ellipsis, it's a variadic function
+            // Set the variadic flag and break
+            if (token_processor_->peek_type() == TokenType::ELLIPSIS) {
+                token_processor_->ellipsis();
+                is_variadic = true;
+                break;
+            }
 
             // Get data type and identifier
             Type *data_type = token_processor_->next_data_type();
-            std::string identifier = token_processor_->next_identifier();
+            string identifier = token_processor_->next_identifier();
 
             // Insert the parameter into the parameter list
             VariableManager::insert(data_type, identifier, Context::get_name());
@@ -136,7 +151,7 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
         }
 
         // Insert the function prototype into the symbol table
-        FunctionManager::insert(return_type, name, parameters);
+        FunctionManager::insert(return_type, name, parameters, is_variadic);
 
         // Update the prototype
         prototype = FunctionManager::find(name);
@@ -152,8 +167,7 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
 
     // Otherwise, it's a definition
     // Make sure the parameters have names
-    for (const auto &parameters = prototype->parameters_;
-         auto param : parameters) {
+    for (auto param : prototype->parameters_) {
         if (param->name.empty())
             throw SyntaxException("parameter " + param->name +
                                   " must have a name");
@@ -184,7 +198,7 @@ FunctionDefinitionNode *Parser::function_declaration(Type *return_type,
 CodeBlockNode *Parser::code_block() {
     token_processor_->lbrace();
 
-    std::vector<StatementNode *> statements;
+    vector<StatementNode *> statements;
     while (token_processor_->peek_type() != TokenType::RBRACE) {
         statements.push_back(statement());
     }

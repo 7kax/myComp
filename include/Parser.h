@@ -4,9 +4,9 @@
 // This is the header file for the parser.
 // The parser is responsible for parsing the input
 
-#include "TokenProcessor.h"
-#include "Expression.h"
 #include "ASTNode.h"
+#include "Expression.h"
+#include "TokenProcessor.h"
 
 namespace myComp {
 class Parser {

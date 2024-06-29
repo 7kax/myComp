@@ -1,5 +1,5 @@
-void printf(char *fmt);
-void scanf(char *fmt);
+void printf(char *fmt, ...);
+void scanf(char *fmt, ...);
 
 int binary_search(int *arr, int l, int r, int x) {
 

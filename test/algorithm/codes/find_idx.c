@@ -1,4 +1,4 @@
-void printf(char *fmt);
+void printf(char *fmt, ...);
 int find_idx(int *arr, int n, int x);
 void print_result(int result);
 

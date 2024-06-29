@@ -6,6 +6,7 @@ from pathlib import Path
 
 all_correct = True
 
+
 def cleanup():
     # 删除生成的文件
     if os.path.exists("out"):
@@ -54,10 +55,10 @@ def compile_and_run_test(test_file: Path):
         print(output)
         print("expected output:")
         print(expected_output)
+        global all_correct
         all_correct = False
-    
-    print()
 
+    print()
 
 
 def main():
@@ -65,7 +66,7 @@ def main():
     test_types = [
         "algorithm",  # 测试编译器是否能正确编译算法
         "function",  # 测试编译器是否实现了指定的功能
-        "error",     # 测试编译器是否能正确处理错误
+        "error",  # 测试编译器是否能正确处理错误
     ]
 
     for test_type in test_types:
@@ -85,6 +86,8 @@ def main():
 
     if all_correct:
         print("ALL TESTS PASSED!!!")
+    else:
+        print("SOME TESTS FAILED!!!")
 
 
 if __name__ == "__main__":

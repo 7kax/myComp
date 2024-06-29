@@ -1,9 +1,10 @@
 #ifndef MYCOMP_ERRORS_H
 #define MYCOMP_ERRORS_H
 
-#include "Token.h"
 #include <exception>
 #include <string_view>
+
+#include "Token.h"
 
 namespace myComp {
 // Throw this exception when an unexpected token is found
@@ -14,16 +15,16 @@ class UnexpectedTokenException : public std::exception {
         msg_ = "Expected ";
         msg_ += expected;
         msg_ += " but got token ";
-        msg_ += Token::token_str.at(got);
+        msg_ += token_str.at(got);
         msg_ += " on line ";
         msg_ += std::to_string(line);
     }
 
     UnexpectedTokenException(TokenType got, int line, TokenType expected) {
         msg_ = "Expected ";
-        msg_ += Token::token_str.at(expected);
+        msg_ += token_str.at(expected);
         msg_ += " but got token ";
-        msg_ += Token::token_str.at(got);
+        msg_ += token_str.at(got);
         msg_ += " on line ";
         msg_ += std::to_string(line);
     }

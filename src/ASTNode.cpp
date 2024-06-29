@@ -922,11 +922,15 @@ FunctionCallNode::generate_code(CodeGenerator *code_generator) const {
     FunctionPrototype *prototype = FunctionManager::find(name_);
 
     for (int i = arguments_.size(); i >= 1; i--) {
+        // Check if exceeds the number of parameters
+        if (i > prototype->parameters_.size() && !prototype->is_variadic_) {
+            throw SyntaxException("too many arguments to function call");
+        }
+
         // Calculate the i'th argument
         int reg = arguments_[i - 1]->generate_code(code_generator).value();
 
         // Type cast the i'th argument
-        // If exceeds the number of parameters, do nothing
         if (i <= prototype->parameters_.size()) {
             Type *arg_type = arguments_[i - 1]->type();
             Type *param_type = prototype->parameters_[i - 1]->type;

@@ -30,6 +30,7 @@ class TokenProcessor {
     void rparen() { this->match(TokenType::RPAREN); }
     void lbrace() { this->match(TokenType::LBRACE); }
     void rbrace() { this->match(TokenType::RBRACE); }
+    void ellipsis() { this->match(TokenType::ELLIPSIS); }
 
   private:
     Scanner scanner;

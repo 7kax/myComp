@@ -37,7 +37,7 @@ FunctionPrototype *FunctionManager::find(const std::string &name) {
 }
 
 void FunctionManager::insert(Type *return_type, const std::string &name,
-                             std::vector<Variable *> parameters) {
+                             std::vector<Variable *> parameters, bool is_variadic) {
     auto &cache = getCache();
     auto it = cache.find(name);
     if (it != cache.end()) {
@@ -47,6 +47,7 @@ void FunctionManager::insert(Type *return_type, const std::string &name,
     func->return_type_ = return_type;
     func->name_ = name;
     func->parameters_ = std::move(parameters);
+    func->is_variadic_ = is_variadic;
     cache[name] = std::move(func);
 }
 } // namespace myComp

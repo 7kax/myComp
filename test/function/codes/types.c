@@ -1,4 +1,4 @@
-void printf(char *fmt);
+void printf(char *fmt, ...);
 
 int main() {
     int a;
